@@ -57,7 +57,7 @@ function SignUp() {
         />
         <input
           onChange={handleChange}
-          type="text"
+          type="password"
           id="password"
           placeholder="password"
           className="border p-3 rounded-lg "
