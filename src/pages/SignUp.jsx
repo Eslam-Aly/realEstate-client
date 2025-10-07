@@ -1,8 +1,9 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import OAuth from "../components/OAuth.jsx";
 
 function SignUp() {
-  const [eroor, setError] = React.useState(null);
+  const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
   const [formData, setFormData] = React.useState({});
   const navigate = useNavigate();
@@ -69,6 +70,7 @@ function SignUp() {
         >
           {loading ? "Loading..." : "Sign Up"}
         </button>
+        <OAuth />
       </form>
       <div className="flex gap-2 mt-5">
         <p>Have an account?</p>
@@ -77,7 +79,7 @@ function SignUp() {
           Login
         </Link>
       </div>
-      {eroor && <p className="text-red-600 mt-3">{eroor}</p>}
+      {error && <p className="text-red-600 mt-3">{error}</p>}
     </div>
   );
 }

@@ -1,10 +1,11 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import OAuth from "../components/OAuth.jsx";
 import {
   signInFailure,
   signInStart,
-  singInSuccess,
+  signInSuccess,
 } from "../redux/user/userSlice.js";
 
 function SignIn() {
@@ -33,7 +34,7 @@ function SignIn() {
         dispatch(signInFailure(data.message));
         return;
       }
-      dispatch(singInSuccess(data));
+      dispatch(signInSuccess(data));
       navigate("/");
     } catch (error) {
       dispatch(signInFailure(error.message));
@@ -65,6 +66,7 @@ function SignIn() {
         >
           {loading ? "Loading..." : "Sign In"}
         </button>
+        <OAuth />
       </form>
       <div className="flex gap-2 mt-5">
         <p>Don't have an account?</p>
