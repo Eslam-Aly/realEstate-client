@@ -12,6 +12,12 @@ import {
   updateUserSuccess,
   updateUserFaliure,
   updateUserStart,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFaliure,
+  signOutStart,
+  signOutSuccess,
+  signOutFaliure,
 } from "../redux/user/userSlice.js";
 import { useDispatch } from "react-redux";
 
@@ -87,6 +93,36 @@ function Profile() {
       setUpdateSuccess(true);
     } catch (error) {
       dispatch(updateUserFaliure(error.message));
+    }
+  };
+  const handleDeleteUser = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFaliure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess());
+    } catch (error) {
+      dispatch(deleteUserFaliure(error.message));
+    }
+  };
+  const handleSignOut = async () => {
+    try {
+      dispatch(signOutStart());
+      const res = await fetch(`/api/auth/signout`);
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(signOutFaliure(data.message));
+        return;
+      }
+      dispatch(signOutSuccess());
+    } catch (error) {
+      dispatch(signOutFaliure(error.message));
     }
   };
   return (
@@ -176,8 +212,18 @@ function Profile() {
         </p>
       )}
       <div className="mt-4 flex justify-between max-w-lg mx-auto text-red-600">
-        <button>Delete Account</button>
-        <button>Sign Out</button>
+        <button
+          onClick={handleDeleteUser}
+          className="hover:underline cursor-pointer"
+        >
+          Delete Account
+        </button>
+        <button
+          onClick={handleSignOut}
+          className="hover:underline cursor-pointer"
+        >
+          Sign Out
+        </button>
       </div>
     </div>
   );
