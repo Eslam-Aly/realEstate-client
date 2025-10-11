@@ -20,6 +20,8 @@ import {
   signOutFaliure,
 } from "../redux/user/userSlice.js";
 import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import { set } from "mongoose";
 
 function Profile() {
   const dispatch = useDispatch();
@@ -32,6 +34,8 @@ function Profile() {
   const [uploadProgress, setUploadProgress] = useState(null);
   const [uploadStatus, setUploadStatus] = useState("");
   const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [showListingsError, setShowListingsError] = useState(false);
+  const [showListings, setShowListings] = useState([]);
 
   useEffect(() => {
     if (file) {
@@ -125,6 +129,39 @@ function Profile() {
       dispatch(signOutFaliure(error.message));
     }
   };
+  const handleShowListings = async () => {
+    try {
+      setShowListingsError(false);
+      const res = await fetch(`/api/user/listings/${currentUser._id}`);
+      console.log(res);
+      console.log(currentUser._id);
+      const data = await res.json();
+      if (data.success === false) {
+        setShowListingsError(true);
+        return;
+      }
+      setShowListings(data);
+    } catch (error) {
+      setShowListingsError(true);
+    }
+  };
+  const handleDeleteListing = async (listingId) => {
+    try {
+      const res = await fetch(`/api/listings/delete/${listingId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        alert("Error deleting listing");
+        return;
+      }
+      setShowListings((prev) =>
+        prev.filter((listing) => listing._id !== listingId)
+      );
+    } catch (error) {
+      alert("Error deleting listing");
+    }
+  };
   return (
     <div>
       <h1 className="text-3xl text-center font-semibold my-7">Profile</h1>
@@ -200,6 +237,12 @@ function Profile() {
         >
           {loading ? "Loading..." : "Update Profile"}
         </button>
+        <Link
+          className="text-white bg-green-600 p-3 rounded-lg font-semibold text-center hover:bg-green-500 transition cursor-pointer"
+          to="/create-listing"
+        >
+          Create Listing
+        </Link>
       </form>
       {error && (
         <p className="text-red-500 text-center mt-5 max-w-lg mx-auto">
@@ -224,7 +267,51 @@ function Profile() {
         >
           Sign Out
         </button>
+        <button
+          onClick={handleShowListings}
+          className="  text-green-600 p-3 rounded-lg font-semibold hover:underline transition cursor-pointer"
+        >
+          Show Listings
+        </button>
       </div>
+      {showListingsError && (
+        <p className="text-red-500 text-center mt-5 max-w-lg mx-auto">
+          Error fetching listings
+        </p>
+      )}
+      {showListings.length > 0 &&
+        showListings.map((listing) => (
+          <div
+            key={listing._id}
+            className="mt-5 max-w-lg mx-auto border p-4 rounded-lg space-y-4"
+          >
+            <a
+              href={`/listing/${listing._id}`}
+              className="text-lg font-semibold hover:underline block"
+            >
+              {listing.title}
+            </a>
+            <img
+              src={listing.images[0]}
+              alt="listing image"
+              className="w-full h-64 object-cover rounded-md"
+            />
+            <p className="text-gray-600">{listing.description}</p>
+            <div className=" flex justify-between">
+              <button
+                onClick={() => handleDeleteListing(listing._id)}
+                className="text-white hover:bg-red-500 w-24 h-10 bg-red-600 rounded-lg cursor-pointer"
+              >
+                Delete
+              </button>
+              <Link to={`/update-listing/${listing._id}`}>
+                <button className="text-white hover:bg-blue-500 w-24 h-10 bg-blue-600 rounded-lg cursor-pointer">
+                  Edit
+                </button>
+              </Link>
+            </div>
+          </div>
+        ))}
     </div>
   );
 }
