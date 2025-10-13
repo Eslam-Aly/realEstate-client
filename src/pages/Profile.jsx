@@ -21,7 +21,6 @@ import {
 } from "../redux/user/userSlice.js";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { set } from "mongoose";
 
 function Profile() {
   const dispatch = useDispatch();
@@ -296,7 +295,7 @@ function Profile() {
               alt="listing image"
               className="w-full h-64 object-cover rounded-md"
             />
-            <p className="text-gray-600">{listing.description}</p>
+
             <div className=" flex justify-between">
               <button
                 onClick={() => handleDeleteListing(listing._id)}

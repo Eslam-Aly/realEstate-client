@@ -172,7 +172,7 @@ function UpdateListing() {
       if (data.success === false) {
         setError(data.message);
       }
-      navigate(`/listings/${params.listingId}`);
+      navigate(`/api/listings/get/${params.listingId}`);
     } catch (error) {
       setError(error.message);
       setUploading(false);

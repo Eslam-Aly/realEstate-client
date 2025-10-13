@@ -152,7 +152,7 @@ function CreateListing() {
       if (data.success === false) {
         setError(data.message);
       }
-      navigate(`/listings/${data.listing._id}`);
+      navigate(`/listings/get/${data.listing._id}`);
     } catch (error) {
       setError(error.message);
       setUploading(false);
@@ -173,24 +173,12 @@ function CreateListing() {
             value={formData.type}
             required
           >
-            <option className="hidden" value="">
-              Select Type
-            </option>
-            <option className="hidden" value="apartmentRent">
-              Apartment for rent
-            </option>
-            <option className="hidden" value="apartmentSale">
-              Apartment for sale
-            </option>
-            <option className="hidden" value="villaRent">
-              Villa for rent
-            </option>
-            <option className="hidden" value="villaSale">
-              Villa for sale
-            </option>
-            <option className="hidden" value="other">
-              Other
-            </option>
+            <option value="">Select Type</option>
+            <option value="apartmentRent">Apartment for rent</option>
+            <option value="apartmentSale">Apartment for sale</option>
+            <option value="villaRent">Villa for rent</option>
+            <option value="villaSale">Villa for sale</option>
+            <option value="other">Other</option>
           </select>
           <input
             required
