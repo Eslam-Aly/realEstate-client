@@ -19,8 +19,18 @@ function Search() {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get("searchTerm") || "";
     const typeFromUrl = urlParams.get("type");
-    const normalizedType =
-      typeFromUrl === "rent" || typeFromUrl === "sale" ? typeFromUrl : "all";
+    const validTypes = [
+      "apartmentRent",
+      "apartmentSale",
+      "villaRent",
+      "villaSale",
+      "other",
+      "rent",
+      "sale",
+    ];
+    const normalizedType = validTypes.includes(typeFromUrl)
+      ? typeFromUrl
+      : "all";
     const parkingFromUrl = urlParams.get("parking") === "true";
     const furnishedFromUrl = urlParams.get("furnished") === "true";
     const sortFromUrl = urlParams.get("sort") || "createdAt";
@@ -56,8 +66,10 @@ function Search() {
         const endpoint = searchQuery
           ? `/api/listings/get?${searchQuery}`
           : `/api/listings/get`;
+        console.log("Fetching from:", endpoint);
         const response = await fetch(endpoint);
         const data = await response.json();
+        console.log("Search results:", data);
         setListings(data);
       } catch (error) {
         console.error("Error fetching listings:", error);
@@ -69,14 +81,10 @@ function Search() {
   }, [location.search]);
 
   const handleChange = (e) => {
-    if (
-      e.target.id === "rent" ||
-      e.target.id === "sale" ||
-      e.target.id === "all"
-    ) {
+    if (e.target.id === "type") {
       setSidebarData((prevData) => ({
         ...prevData,
-        type: e.target.id,
+        type: e.target.value,
       }));
     }
     if (e.target.id === "parking" || e.target.id === "furnished") {
@@ -142,29 +150,29 @@ function Search() {
             />
           </div>
 
-          <label htmlFor="type">Type</label>
-          <div className="gap-2 flex items-center">
-            <input
-              type="checkbox"
-              id="all"
+          <div className="flex flex-col gap-2">
+            <label htmlFor="type">Property Type</label>
+            <select
+              id="type"
+              value={sidebarData.type}
               onChange={handleChange}
-              checked={sidebarData.type === "all"}
-            />
-            <span className="mr-2">Rent & Sale</span>
-            <input
-              type="checkbox"
-              id="rent"
-              onChange={handleChange}
-              checked={sidebarData.type === "rent"}
-            />
-            <span className="mr-2">Rent</span>
-            <input
-              type="checkbox"
-              id="sale"
-              onChange={handleChange}
-              checked={sidebarData.type === "sale"}
-            />
-            <span>Sale</span>
+              className="border border-gray-300 rounded-md p-2"
+            >
+              <option value="all">All Properties</option>
+              <optgroup label="Apartments">
+                <option value="apartmentRent">Apartment for Rent</option>
+                <option value="apartmentSale">Apartment for Sale</option>
+              </optgroup>
+              <optgroup label="Villas">
+                <option value="villaRent">Villa for Rent</option>
+                <option value="villaSale">Villa for Sale</option>
+              </optgroup>
+              <optgroup label="General Categories">
+                <option value="rent">All Rentals</option>
+                <option value="sale">All Sales</option>
+              </optgroup>
+              <option value="other">Other</option>
+            </select>
           </div>
           <label htmlFor="">Amenities: </label>
           <div className="flex gap-2 items-center">
@@ -216,9 +224,7 @@ function Search() {
 
       <div className="">
         <h2 className="text-2xl font-bold text-center my-4">Search Results</h2>
-        <div className="max-w-6xl mx-auto p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {/* Example listing card */}
-
+        <div className="max-w-6xl mx-auto p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
           {/* Repeat listing cards as needed */}
           {loading && <p className="col-span-full text-center">Loading...</p>}
           {!loading && listings.length === 0 && (
@@ -228,41 +234,8 @@ function Search() {
           )}
           {!loading &&
             listings.map((listing) => (
-              <div
-                key={listing._id}
-                className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition"
-              >
-                <div className="h-40 bg-gray-200">
-                  {listing.images && listing.images.length > 0 ? (
-                    <img
-                      src={listing.images[0]}
-                      alt={listing.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-500">
-                      No image
-                    </div>
-                  )}
-                </div>
-                <div className="p-4 space-y-2">
-                  <h3 className="text-lg font-semibold truncate">
-                    {listing.title}
-                  </h3>
-                  <p className="text-blue-600 font-bold">
-                    ${listing.regularPrice?.toLocaleString()}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {listing.bedrooms} Beds • {listing.bathrooms} Baths
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/listing/${listing._id}`)}
-                    className="mt-2 inline-block bg-blue-600 text-white text-sm px-3 py-1 rounded hover:bg-blue-700 transition"
-                  >
-                    View Details
-                  </button>
-                </div>
+              <div className="flex flex-wrap " key={listing._id}>
+                <ListingItems listing={listing} />
               </div>
             ))}
         </div>
