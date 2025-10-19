@@ -145,22 +145,29 @@ function Profile() {
     }
   };
   const handleDeleteListing = async (listingId) => {
+    const ok = window.confirm("Delete this listing?");
+    if (!ok) return;
     try {
+      const token =
+        localStorage.getItem("token") ||
+        localStorage.getItem("access_token") ||
+        "";
       const res = await fetch(`/api/listings/delete/${listingId}`, {
         method: "DELETE",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      const data = await res.json();
-      if (data.success === false) {
-        alert("Error deleting listing");
-        return;
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.success === false) {
+        throw new Error(data?.message || "Delete failed");
       }
       setShowListings((prev) =>
         prev.filter((listing) => listing._id !== listingId)
       );
     } catch (error) {
-      alert("Error deleting listing");
+      alert(error.message || "Error deleting listing");
     }
   };
+
   return (
     <div>
       <h1 className="text-3xl text-center font-semibold my-7">Profile</h1>
@@ -238,7 +245,7 @@ function Profile() {
         </button>
         <Link
           className="text-white bg-green-600 p-3 rounded-lg font-semibold text-center hover:bg-green-500 transition cursor-pointer"
-          to="/create-listing"
+          to="/createlistingform"
         >
           Create Listing
         </Link>

@@ -7,9 +7,10 @@ function Search() {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
+
   const [sidebarData, setSidebarData] = useState({
     searchTerm: "",
-    type: "all",
+    type: "rent",
     parking: false,
     furnished: false,
     sort: "createdAt",
@@ -86,6 +87,7 @@ function Search() {
         ...prevData,
         type: e.target.value,
       }));
+      setTypeRent(e.target.value === "rent");
     }
     if (e.target.id === "parking" || e.target.id === "furnished") {
       setSidebarData((prevData) => ({
@@ -129,6 +131,7 @@ function Search() {
     const searchQuery = urlParams.toString();
     navigate(searchQuery ? `/search?${searchQuery}` : "/search");
   };
+  const [purpose, setPurpose] = useState("all");
   return (
     <div className="min-h-screen   flex ">
       <div className="w-1/3">
@@ -149,69 +152,159 @@ function Search() {
               className="border border-gray-300 rounded-md p-2 "
             />
           </div>
-
-          <div className="flex flex-col gap-2">
-            <label htmlFor="type">Property Type</label>
-            <select
-              id="type"
-              value={sidebarData.type}
-              onChange={handleChange}
-              className="border border-gray-300 rounded-md p-2"
-            >
-              <option value="all">All Properties</option>
-              <optgroup label="Apartments">
-                <option value="apartmentRent">Apartment for Rent</option>
-                <option value="apartmentSale">Apartment for Sale</option>
-              </optgroup>
-              <optgroup label="Villas">
-                <option value="villaRent">Villa for Rent</option>
-                <option value="villaSale">Villa for Sale</option>
-              </optgroup>
-              <optgroup label="General Categories">
-                <option value="rent">All Rentals</option>
-                <option value="sale">All Sales</option>
-              </optgroup>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <label htmlFor="">Amenities: </label>
-          <div className="flex gap-2 items-center">
-            <input
-              type="checkbox"
-              name=""
-              id="parking"
-              onChange={handleChange}
-              checked={sidebarData.parking}
-            />
-
-            <label htmlFor="parking" className="mr-2">
-              Parking
+          <div className="grid grid-cols-2 gap-4">
+            <label className="flex items-center gap-2 border-slate-600 bg-white border p-3 rounded-lg">
+              <span className="whitespace-nowrap text-sm text-slate-600 ">
+                Purpose:{" "}
+              </span>
+              <select
+                name="purpose"
+                aria-label="Property type"
+                className="w-full appearance-none bg-transparent text-sm outline-none cursor-pointer"
+                value={sidebarData.purpose}
+                onChange={(e) => {
+                  setPurpose(e.target.value);
+                  handleChange(e);
+                }}
+              >
+                <option value="" disabled>
+                  Select purpose
+                </option>
+                <option value="all">All</option>
+                <option value="rent">Rent</option>
+                <option value="sale">Sale</option>
+              </select>
             </label>
-            <input
-              type="checkbox"
-              name=""
-              id="furnished"
-              onChange={handleChange}
-              checked={sidebarData.furnished}
-            />
-            <label htmlFor="furnished">Furnished</label>
-          </div>
-          <div>
-            <label htmlFor="" className="mr-2">
-              Sort By:{" "}
+            <label className="flex items-center gap-2 border-slate-600 bg-white  border p-3 rounded-lg">
+              <span className="whitespace-nowrap text-sm text-slate-600">
+                Type:{" "}
+              </span>
+              {purpose === "rent" && (
+                <select
+                  name="type"
+                  aria-label="Property type"
+                  className="w-full appearance-none bg-transparent text-sm outline-none cursor-pointer "
+                  value={sidebarData.type}
+                  onChange={handleChange}
+                >
+                  <option value="" disabled>
+                    Select type
+                  </option>
+                  <option value="apartment">Apartments for Rent</option>
+                  <option value="villa">Villas for Rent</option>
+                  <option value="commercial">Commercials for Rent</option>
+                  <option value="land">Lands for Rent</option>
+                  <option value="building">Buildings for Rent</option>
+                </select>
+              )}
+              {purpose === "sale" && (
+                <select
+                  name="type"
+                  aria-label="Property type"
+                  className="w-full appearance-none bg-transparent text-sm outline-none cursor-pointer 
+                "
+                  value={sidebarData.type}
+                  onChange={handleChange}
+                >
+                  <option value="" disabled>
+                    Select type
+                  </option>
+                  <option value="apartment">Apartments for Sale</option>
+                  <option value="villa">Villas for Sale</option>
+                  <option value="commercial">Commercials for Sale</option>
+                  <option value="land">Lands for Sale</option>
+                  <option value="building">Buildings for Sale</option>
+                </select>
+              )}
+              {purpose === "all" && (
+                <select
+                  name="type"
+                  aria-label="Property type"
+                  className="w-full appearance-none bg-transparent text-sm outline-none cursor-pointer"
+                  value={sidebarData.type}
+                  onChange={handleChange}
+                >
+                  <option value="" disabled>
+                    Select type
+                  </option>
+                  <option value="all">All</option>
+                  <option value="apartment">Apartments</option>
+                  <option value="villa">Villas</option>
+                  <option value="commercial">Commercials</option>
+                  <option value="land">Lands</option>
+                  <option value="building">Buildings</option>
+                </select>
+              )}
             </label>
-            <select
-              name=""
-              id="sortBy"
-              onChange={handleChange}
-              value={`${sidebarData.sort}_${sidebarData.order}`}
-            >
-              <option value="regularPrice_asc">Price: Low to High</option>
-              <option value="regularPrice_desc">Price: High to Low</option>
-              <option value="createdAt_desc">Newest Listings</option>
-              <option value="createdAt_asc">Oldest Listings</option>
-            </select>
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              value=""
+              className="border p-3 rounded-lg"
+              type="number"
+              name="minPrice"
+              placeholder="Min Price"
+              onChange={handleChange}
+            />
+            <input
+              value=""
+              className="border p-3 rounded-lg"
+              type="number"
+              name="maxPrice"
+              placeholder="Max Price"
+              onChange={handleChange}
+            />
+            <input
+              value=""
+              className="border p-3 rounded-lg"
+              type="number"
+              name="minSize"
+              placeholder="Min Size (sqm)"
+              onChange={handleChange}
+            />
+            <input
+              value=""
+              className="border p-3 rounded-lg"
+              type="number"
+              name="maxSize"
+              placeholder="Max Size (sqm)"
+              onChange={handleChange}
+            />
+            <input
+              value=""
+              className="border p-3 rounded-lg"
+              type="number"
+              name="minBedrooms"
+              placeholder="Min Bedrooms"
+              onChange={handleChange}
+            />
+            <input
+              value=""
+              className="border p-3 rounded-lg"
+              type="number"
+              name="maxBedrooms"
+              placeholder="Max Bedrooms"
+              onChange={handleChange}
+            />
+            <input
+              value=""
+              className="border p-3 rounded-lg"
+              type="number"
+              name="minBathrooms"
+              placeholder="Min Bathrooms"
+              onChange={handleChange}
+            />
+            <input
+              value=""
+              className="border p-3 rounded-lg"
+              type="number"
+              name="maxBathrooms"
+              placeholder="Max Bathrooms"
+              onChange={handleChange}
+            />
+          </div>
+
           <button
             type="submit"
             className="bg-blue-600 text-white rounded-md p-2 hover:bg-blue-700 transition mt-4 cursor-pointer"

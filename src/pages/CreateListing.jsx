@@ -1,4 +1,3 @@
-import { set } from "mongoose";
 import { useState, useRef } from "react";
 import { app } from "../firebase.js";
 import {
@@ -21,20 +20,22 @@ function CreateListing() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileRef = useRef(null);
   const currentUser = useSelector((state) => state.user.currentUser);
+  const [typeRent, setTypeRent] = useState(true);
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     address: "",
-    regularPrice: "",
-    discountedPrice: "",
+    price: "",
+    size: "",
     bedrooms: "",
     bathrooms: "",
     parking: false,
     furnished: false,
     images: [],
+    purpose: "",
     type: "",
-    offer: false,
+
     userRef: currentUser._id,
   });
 
@@ -152,12 +153,20 @@ function CreateListing() {
       if (data.success === false) {
         setError(data.message);
       }
-      navigate(`/listings/get/${data.listing._id}`);
+      navigate(`/listing/${data.listing._id}`);
     } catch (error) {
       setError(error.message);
       setUploading(false);
     } finally {
       setLoading(false);
+    }
+  };
+  const handleTypeChange = (e) => {
+    const value = e.target.value;
+    if (value === "rent") {
+      setTypeRent(true);
+    } else if (value === "sale") {
+      setTypeRent(false);
     }
   };
 
@@ -166,20 +175,71 @@ function CreateListing() {
       <h1 className="text-4xl font-semibold mb-4">Create Listing</h1>
       <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-4">
-          <select
-            className="border p-3 rounded-lg"
-            name="type"
-            onChange={handleChange}
-            value={formData.type}
-            required
-          >
-            <option value="">Select Type</option>
-            <option value="apartmentRent">Apartment for rent</option>
-            <option value="apartmentSale">Apartment for sale</option>
-            <option value="villaRent">Villa for rent</option>
-            <option value="villaSale">Villa for sale</option>
-            <option value="other">Other</option>
-          </select>
+          <div className="grid grid-cols-2 gap-4">
+            <label className="flex items-center gap-2 border-slate-600 bg-white border p-3 rounded-lg">
+              <span className="whitespace-nowrap text-sm text-slate-600 ">
+                Purpose:{" "}
+              </span>
+              <select
+                name="purpose"
+                aria-label="Property type"
+                className="w-full appearance-none bg-transparent text-sm outline-none cursor-pointer"
+                value={typeRent ? "rent" : "sale"}
+                onChange={(e) => {
+                  handleTypeChange(e);
+                  handleChange(e);
+                }}
+              >
+                <option value="" disabled>
+                  Select purpose
+                </option>
+                <option value="rent">Rent</option>
+                <option value="sale">Sale</option>
+              </select>
+            </label>
+            <label className="flex items-center gap-2 border-slate-600 bg-white  border p-3 rounded-lg">
+              <span className="whitespace-nowrap text-sm text-slate-600">
+                Type:{" "}
+              </span>
+              {typeRent ? (
+                <select
+                  name="type"
+                  aria-label="Property type"
+                  className="w-full appearance-none bg-transparent text-sm outline-none cursor-pointer "
+                  value={formData.type}
+                  onChange={handleChange}
+                >
+                  <option value="" disabled>
+                    Select type
+                  </option>
+                  <option value="apartment">Apartments for Rent</option>
+                  <option value="villa">Villas for Rent</option>
+                  <option value="commercial">Commercials for Rent</option>
+                  <option value="land">Lands for Rent</option>
+                  <option value="building">Buildings for Rent</option>
+                </select>
+              ) : (
+                <select
+                  name="type"
+                  aria-label="Property type"
+                  className="w-full appearance-none bg-transparent text-sm outline-none cursor-pointer 
+                "
+                  value={formData.type}
+                  onChange={handleChange}
+                >
+                  <option value="" disabled>
+                    Select type
+                  </option>
+                  <option value="apartment">Apartments for Sale</option>
+                  <option value="villa">Villas for Sale</option>
+                  <option value="commercial">Commercials for Sale</option>
+                  <option value="land">Lands for Sale</option>
+                  <option value="building">Buildings for Sale</option>
+                </select>
+              )}
+            </label>
+          </div>
+
           <input
             required
             value={formData.title}
@@ -211,19 +271,19 @@ function CreateListing() {
         <div className="grid grid-cols-2 gap-4">
           <input
             required
-            value={formData.regularPrice}
+            value={formData.price}
             className="border p-3 rounded-lg"
             type="number"
-            name="regularPrice"
-            placeholder="Regular Price"
+            name="price"
+            placeholder="Price"
             onChange={handleChange}
           />
           <input
-            value={formData.discountedPrice}
+            value={formData.size}
             className="border p-3 rounded-lg"
             type="number"
-            name="discountedPrice"
-            placeholder="Discounted Price"
+            name="size"
+            placeholder="Size (sqm)"
             onChange={handleChange}
           />
           <input
@@ -261,16 +321,6 @@ function CreateListing() {
               checked={formData.furnished}
               type="checkbox"
               name="furnished"
-              onChange={handleChange}
-            />
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            Offer:
-            <input
-              checked={formData.offer}
-              className="cursor-pointer"
-              type="checkbox"
-              name="offer"
               onChange={handleChange}
             />
           </label>

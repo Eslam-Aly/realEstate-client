@@ -1,6 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+// Ensure you have client/public/placeholder.jpg available; set VITE_DEFAULT_LISTING_IMAGE to override in prod.
+import { useMemo, useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
+const DEFAULT_IMAGE_URL =
+  import.meta?.env?.VITE_DEFAULT_LISTING_IMAGE || "/placeholder.jpg";
 
 import { app } from "../firebase.js";
 import {
@@ -10,12 +13,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
-
-const DEFAULT_IMAGE_URL =
-  import.meta?.env?.VITE_DEFAULT_LISTING_IMAGE || "/placeholder.jpg";
-const API_BASE = import.meta?.env?.VITE_API_BASE || "/api";
-const getToken = () =>
-  localStorage.getItem("token") || localStorage.getItem("access_token") || "";
+import { useSelector } from "react-redux";
 
 /** 1) Main selectors */
 const PURPOSES = ["rent", "sale"];
@@ -32,23 +30,32 @@ const CATEGORIES = [
   "other",
 ];
 
-/** 2) Field registry */
+/** 2) Field registry (one place to extend) */
 const FIELD_DEFS = {
+  // shared
   title: { label: "Title", type: "text", required: true },
   address: { label: "Address", type: "location" },
-  description: { label: "Description", type: "textarea", required: true },
+  description: {
+    label: "Description",
+    type: "textarea",
+    required: true,
+    placeholder: "Describe the property, nearby landmarks, terms, etc.",
+  },
   price: { label: "Price", type: "number", min: 0, required: true },
   size: { label: "Size (sqm)", type: "number", min: 0 },
 
+  // residential-only
   bedrooms: {
     label: "Bedrooms",
     type: "select",
-    options: Array.from({ length: 21 }, (_, i) => i),
+    options: [
+      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    ],
   },
   bathrooms: {
     label: "Bathrooms",
     type: "select",
-    options: Array.from({ length: 11 }, (_, i) => i),
+    options: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
   },
   floor: {
     label: "Floor",
@@ -58,6 +65,7 @@ const FIELD_DEFS = {
   furnished: { label: "Furnished", type: "checkbox" },
   parking: { label: "Parking", type: "checkbox" },
 
+  // land-only
   plotArea: {
     label: "Plot Area (sqm)",
     type: "number",
@@ -72,6 +80,7 @@ const FIELD_DEFS = {
   },
   cornerLot: { label: "Corner Lot", type: "checkbox" },
 
+  // commercial-only
   floorArea: {
     label: "Floor Area (sqm)",
     type: "number",
@@ -86,6 +95,7 @@ const FIELD_DEFS = {
   hasMezz: { label: "Mezzanine", type: "checkbox" },
   parkingSpots: { label: "Parking Spots", type: "number", min: 0, step: 1 },
 
+  // whole-building
   totalFloors: {
     label: "Total Floors",
     type: "number",
@@ -206,36 +216,75 @@ const FIELDS_BY_CATEGORY = {
   other: ["title", "address", "description", "price", "size"],
 };
 
-export default function UpdateListing() {
+export default function CreateListingForm() {
   const navigate = useNavigate();
-  const params = useParams();
-  const { currentUser } = useSelector((s) => s.user);
-
-  const [loading, setLoading] = useState(false);
-  const [submitError, setSubmitError] = useState("");
-
-  // Top selectors
   const [purpose, setPurpose] = useState("rent");
   const [category, setCategory] = useState("apartment");
+  const [form, setForm] = useState({}); // all dynamic fields live here
 
-  // Dynamic fields
-  const [form, setForm] = useState({});
-
-  // Location (governorate/city)
-  const [govs, setGovs] = useState([]);
-  const [cities, setCities] = useState([]);
-  const [selectedGov, setSelectedGov] = useState(null);
-  const [selectedCity, setSelectedCity] = useState(null);
+  // Location (governorate/city) state
+  const [govs, setGovs] = useState([]); // [{name, slug}]
+  const [cities, setCities] = useState([]); // [{name, slug}]
+  const [selectedGov, setSelectedGov] = useState(null); // {name, slug}
+  const [selectedCity, setSelectedCity] = useState(null); // {name, slug}
   const [otherCityText, setOtherCityText] = useState("");
 
-  // Images (Firebase)
-  const [file, setFile] = useState([]);
-  const [images, setImages] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState("");
+
+  // Firebase uploader states
+  const currentUser = useSelector((state) => state.user?.currentUser);
+
+  const [file, setFile] = useState([]); // FileList from input
+  const [images, setImages] = useState([]); // uploaded image URLs
   const [imageUploadError, setImageUploadError] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileRef = useRef(null);
 
+  // Fetch governorates on mount
+  useEffect(() => {
+    let active = true;
+    fetch("/api/locations/governorates")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!active) return;
+        setGovs(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setGovs([]));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Fetch cities when governorate changes
+  useEffect(() => {
+    let active = true;
+    if (!selectedGov) {
+      setCities([]);
+      setSelectedCity(null);
+      setOtherCityText("");
+      return;
+    }
+    fetch(`/api/locations/cities/${selectedGov.slug}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!active) return;
+        setCities(Array.isArray(data) ? data : []);
+        setSelectedCity(null);
+        setOtherCityText("");
+      })
+      .catch(() => {
+        setCities([]);
+        setSelectedCity(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, [selectedGov]);
+
+  // 4) compute which fields to render
   const visibleFields = useMemo(
     () => FIELDS_BY_CATEGORY[category] ?? [],
     [category]
@@ -255,129 +304,18 @@ export default function UpdateListing() {
     setForm((p) => ({ ...p, [key]: v }));
   };
 
-  // Load governorates on mount
-  useEffect(() => {
-    let active = true;
-    fetch(`/api/locations/governorates`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (!active) return;
-        setGovs(Array.isArray(data) ? data : []);
-      })
-      .catch(() => setGovs([]));
-    return () => {
-      active = false;
-    };
-  }, []);
+  const API_BASE = import.meta?.env?.VITE_API_BASE || "/api";
+  const getToken = () =>
+    localStorage.getItem("token") || localStorage.getItem("access_token") || "";
 
-  // Load listing data
-  useEffect(() => {
-    const id = params.listingId;
-    if (!id) return;
-    (async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`${API_BASE}/listings/get/${id}`);
-        const data = await res.json();
-        if (!res.ok || data?.success === false)
-          throw new Error(data?.message || "Failed to load listing");
-
-        // Top selectors
-        setPurpose(data.purpose || "rent");
-        setCategory(data.category || "apartment");
-
-        // Images
-        setImages(
-          Array.isArray(data.images) && data.images.length
-            ? data.images
-            : [DEFAULT_IMAGE_URL]
-        );
-
-        // Location prefill
-        const loc = data.location || {};
-        const gov = loc.governorate || null;
-        const city = loc.city || null;
-        setOtherCityText(loc.city_other_text || "");
-
-        if (gov?.slug) {
-          const resCities = await fetch(`/api/locations/cities/${gov.slug}`);
-          const list = await resCities.json();
-          setCities(Array.isArray(list) ? list : []);
-          setSelectedGov(gov);
-          if (city?.slug) {
-            const match = (Array.isArray(list) ? list : []).find(
-              (c) => String(c.slug) === String(city.slug)
-            );
-            setSelectedCity(match || city);
-          }
-        }
-
-        // Map subdocs into flat form
-        const f = {
-          title: data.title || "",
-          description: data.description || "",
-          price: data.price ?? "",
-
-          size: data.residential?.size ?? data.other?.size ?? "",
-          bedrooms: data.residential?.bedrooms ?? "",
-          bathrooms: data.residential?.bathrooms ?? "",
-          floor: data.residential?.floor ?? "",
-          furnished: data.residential?.furnished ?? false,
-          parking: data.residential?.parking ?? false,
-
-          plotArea: data.land?.plotArea ?? "",
-          frontage: data.land?.frontage ?? data.commercial?.frontage ?? "",
-          zoning: data.land?.zoning ?? "",
-          cornerLot: data.land?.cornerLot ?? false,
-
-          floorArea: data.commercial?.floorArea ?? "",
-          licenseType: data.commercial?.licenseType ?? "",
-          hasMezz: data.commercial?.hasMezz ?? false,
-          parkingSpots: data.commercial?.parkingSpots ?? "",
-
-          totalFloors: data.building?.totalFloors ?? "",
-          totalUnits: data.building?.totalUnits ?? "",
-          elevator: data.building?.elevator ?? false,
-          landArea: data.building?.landArea ?? "",
-          buildYear: data.building?.buildYear ?? "",
-        };
-        setForm(f);
-      } catch (e) {
-        setSubmitError(e.message || "Failed to load listing");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [params.listingId]);
-
-  // When governorate changes via UI
-  useEffect(() => {
-    let active = true;
-    if (!selectedGov) {
-      setCities([]);
-      setSelectedCity(null);
-      setOtherCityText("");
-      return;
-    }
-    fetch(`/api/locations/cities/${selectedGov.slug}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (!active) return;
-        setCities(Array.isArray(data) ? data : []);
-      })
-      .catch(() => setCities([]));
-    return () => {
-      active = false;
-    };
-  }, [selectedGov?.slug]);
-
-  // Firebase helpers
+  // Firebase image uploader helpers
   const clearFileInput = () => {
     setFile([]);
     if (fileRef.current) fileRef.current.value = "";
   };
-  const storeImage = async (file) =>
-    new Promise((resolve, reject) => {
+
+  const storeImage = async (file) => {
+    return new Promise((resolve, reject) => {
       const storage = getStorage(app);
       const userId = currentUser?._id || "anon";
       const fileName = `${userId}-${file.name}-${uuidv4()}`;
@@ -389,7 +327,8 @@ export default function UpdateListing() {
         (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(Math.round(progress));
+          const percent = Math.round(progress);
+          setUploadProgress(percent);
           setImageUploadError("");
         },
         (error) => reject(error),
@@ -400,8 +339,10 @@ export default function UpdateListing() {
         }
       );
     });
+  };
 
   const handleImageSubmit = async () => {
+    // replicate old constraints: max 6 total images
     const current = images.length;
     const selected = file?.length || 0;
     if (selected === 0) {
@@ -425,9 +366,9 @@ export default function UpdateListing() {
     try {
       setUploading(true);
       setUploadProgress(0);
-      const uploaded = await Promise.all(
-        Array.from({ length: selected }, (_, i) => storeImage(file[i]))
-      );
+      const promises = [];
+      for (let i = 0; i < selected; i++) promises.push(storeImage(file[i]));
+      const uploaded = await Promise.all(promises);
       setImages((prev) => prev.concat(uploaded));
       setImageUploadError("");
     } catch (err) {
@@ -446,10 +387,11 @@ export default function UpdateListing() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError("");
+    setSubmitSuccess("");
 
-    // validate required fields (excluding address handled via selectors)
+    // Minimal client validation for non-location fields
     for (const key of visibleFields) {
-      if (key === "address") continue;
+      if (key === "address") continue; // address validated via governorate/city below
       const def = FIELD_DEFS[key];
       if (def?.required && (form[key] === undefined || form[key] === "")) {
         setSubmitError(`${def.label} is required`);
@@ -457,6 +399,7 @@ export default function UpdateListing() {
       }
     }
 
+    // Validate location (governorate & city)
     if (!selectedGov) {
       setSubmitError("Governorate is required");
       return;
@@ -466,9 +409,11 @@ export default function UpdateListing() {
       return;
     }
 
+    // Set images fallback if none uploaded
     const finalImages =
       images && images.length > 0 ? images : [DEFAULT_IMAGE_URL];
 
+    // Compose a human-friendly address string for display/compat
     const addressDisplay = `${selectedGov.name} - ${selectedCity.name}${
       selectedCity.slug === "other" && otherCityText
         ? ` (${otherCityText})`
@@ -479,7 +424,7 @@ export default function UpdateListing() {
       purpose,
       category,
       ...form,
-      address: addressDisplay,
+      address: addressDisplay, // keep for backward compatibility
       images: finalImages,
       location: {
         governorate: { slug: selectedGov.slug, name: selectedGov.name },
@@ -489,27 +434,39 @@ export default function UpdateListing() {
     };
 
     try {
-      setLoading(true);
-      const res = await fetch(
-        `${API_BASE}/listings/update/${params.listingId}`,
-        {
-          method: "PATCH", // your routes use PATCH for update
-          headers: {
-            "Content-Type": "application/json",
-            ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      setSubmitting(true);
+      const res = await fetch(`${API_BASE}/listings/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || data?.success === false)
-        throw new Error(data?.message || "Update failed");
-
-      navigate(`/listing/${params.listingId}`);
+      if (!res.ok) {
+        throw new Error(data?.message || "Failed to create listing");
+      }
+      setSubmitSuccess("Listing created successfully");
+      // Optional: reset minimal fields but keep selectors
+      setForm({});
+      setSelectedGov(null);
+      setSelectedCity(null);
+      setOtherCityText("");
+      setImages([]);
+      setImageUploadError("");
+      setUploadProgress(0);
+      clearFileInput();
+      // console.log created listing id
+      console.log("Created listing:", data?.listing || data);
+      const createdId = data?.listing?._id || data?._id;
+      if (createdId) {
+        navigate(`/listing/${createdId}`);
+      }
     } catch (err) {
       setSubmitError(err.message || "Something went wrong");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -518,8 +475,7 @@ export default function UpdateListing() {
       onSubmit={handleSubmit}
       className="max-w-xl mx-auto p-4 space-y-4 shadow-lg rounded-md mt-16"
     >
-      <h1 className="text-2xl font-bold text-center mb-8">Update Listing</h1>
-
+      <h1 className="text-2xl font-bold text-center mb-8">Create Listing</h1>
       {/* Top selectors */}
       <div className="grid grid-cols-2 gap-3 ">
         <label className="flex items-center gap-2 border p-3 rounded-lg">
@@ -555,10 +511,10 @@ export default function UpdateListing() {
 
       {/* Dynamic fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {(FIELDS_BY_CATEGORY[category] ?? []).map((key) => {
+        {visibleFields.map((key) => {
           const def = FIELD_DEFS[key];
           const v = def.type === "checkbox" ? !!form[key] : form[key] ?? "";
-
+          // Custom renderer for address/location
           if (key === "address") {
             return (
               <div
@@ -629,7 +585,6 @@ export default function UpdateListing() {
               </div>
             );
           }
-
           if (def.type === "select") {
             return (
               <label key={key} className="flex flex-col gap-1">
@@ -651,7 +606,6 @@ export default function UpdateListing() {
               </label>
             );
           }
-
           if (def.type === "checkbox") {
             return (
               <label
@@ -667,7 +621,6 @@ export default function UpdateListing() {
               </label>
             );
           }
-
           if (def.type === "textarea") {
             return (
               <label
@@ -684,7 +637,6 @@ export default function UpdateListing() {
               </label>
             );
           }
-
           return (
             <label key={key} className="flex flex-col gap-1">
               <span className="text-sm">{def.label}</span>
@@ -741,10 +693,10 @@ export default function UpdateListing() {
           <p className="text-red-700 text-sm">{imageUploadError}</p>
         )}
 
-        {Array.isArray(images) &&
+        {images.length > 0 &&
           images.map((url, index) => (
             <div
-              key={url + index}
+              key={url}
               className="flex justify-between p-3 border items-center rounded-lg"
             >
               <img
@@ -761,19 +713,32 @@ export default function UpdateListing() {
               </button>
             </div>
           ))}
+        {images.length === 0 && (
+          <p className="text-xs text-slate-500">
+            No images selected — a default image will be used.
+          </p>
+        )}
       </div>
 
-      {submitError && (
-        <div className="text-sm rounded-md px-3 py-2 bg-red-50 text-red-700">
-          {submitError}
+      {(submitError || submitSuccess) && (
+        <div
+          className={`text-sm rounded-md px-3 py-2 ${
+            submitError
+              ? "bg-red-50 text-red-700"
+              : "bg-green-50 text-green-700"
+          }`}
+        >
+          {submitError || submitSuccess}
         </div>
       )}
 
       <button
-        disabled={uploading || loading}
-        className="w-full rounded-lg px-4 py-3 text-white cursor-pointer hover:bg-blue-500 bg-indigo-600 disabled:opacity-70"
+        disabled={submitting}
+        className={`w-full rounded-lg px-4 py-3 text-white cursor-pointer hover:bg-blue-500 ${
+          submitting ? "bg-indigo-400" : "bg-indigo-600 hover:opacity-95"
+        }`}
       >
-        {loading ? "Updating…" : "Update Listing"}
+        {submitting ? "Creating…" : "Create Listing"}
       </button>
     </form>
   );
@@ -781,6 +746,6 @@ export default function UpdateListing() {
 
 function toTitle(s) {
   if (s == null) return "";
-  s = String(s);
+  s = String(s); // <-- ensure it's a string
   return s.replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }

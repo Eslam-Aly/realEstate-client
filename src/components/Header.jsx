@@ -30,30 +30,37 @@ function Header() {
     <header className="bg-blue-800 text-white  w-full  shadow-md h-20 flex items-center sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between w-[90%] ">
         <div>
-          <Link to="/" className="text-sm md:text-2xl font-bold">
-            Real-Estate App
+          <Link to="/" className="text-sm md:text-2xl font-bold ">
+            Logo
           </Link>
         </div>
-        <div>
+        <div className="flex items-center justify-center ">
           <form
             onSubmit={handleSubmit}
-            className="rounded-md flex items-center px-2 py-1  border border-gray-300"
+            className="flex w-[60%] sm:w-[80%]  items-center rounded-full border border-gray-300 bg-white/90 px-4 py-1 shadow-md backdrop-blur"
           >
             <input
               type="text"
               placeholder="Search..."
-              className=" focus:outline-none "
+              className="w-full bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button type="submit">
-              <FaSearch className="text-white" />
+            <button
+              type="submit"
+              className="ml-2 flex h-6 w-6 items-center justify-center rounded-full text-blue-700"
+            >
+              <FaSearch className="text-blue-700" />
             </button>
           </form>
         </div>
         <nav className="space-x-4">
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
+          <Link to="/" className="hidden md:inline-block">
+            Home
+          </Link>
+          <Link to="/about" className="hidden md:inline-block">
+            About
+          </Link>
 
           {currentUser ? (
             <Link to="/profile">

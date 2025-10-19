@@ -12,6 +12,7 @@ import CreateListing from "./pages/CreateListing.jsx";
 import UpdateListing from "./pages/UpdateListing.jsx";
 import Listing from "./pages/Listing.jsx";
 import Search from "./pages/Search.jsx";
+import CreateListingForm from "./pages/CreateListingForm.jsx";
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
-        <Route path="/listing/:listingId" element={<Listing />} />
+        <Route path="/listing/:createdId" element={<Listing />} />
         <Route path="/search" element={<Search />} />
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
@@ -32,6 +33,7 @@ function App() {
         </Route>
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/createlistingform" element={<CreateListingForm />} />
       </Routes>
     </BrowserRouter>
   );
