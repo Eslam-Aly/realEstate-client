@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import LangSwitch from "./LangSwitch.jsx";
 
 function Header() {
   const Navigate = useNavigate();
@@ -27,10 +28,13 @@ function Header() {
   }, [location.search]);
 
   return (
-    <header className="bg-blue-800 text-white  w-full  shadow-md h-20 flex items-center sticky top-0 z-50">
+    <header
+      dir="ltr"
+      className="bg-blue-700 text-white  w-full  shadow-md h-20 flex items-center sticky top-0 z-50"
+    >
       <div className="container mx-auto flex items-center justify-between w-[90%] ">
         <div>
-          <Link to="/" className="text-sm md:text-2xl font-bold ">
+          <Link to="/" className="text-sm md:text-2xl font-bold cursor-pointer">
             Logo
           </Link>
         </div>
@@ -54,14 +58,14 @@ function Header() {
             </button>
           </form>
         </div>
-        <nav className="space-x-4">
+        <nav className="flex items-center gap-4">
           <Link to="/" className="hidden md:inline-block">
             Home
           </Link>
           <Link to="/about" className="hidden md:inline-block">
             About
           </Link>
-
+          <LangSwitch />
           {currentUser ? (
             <Link to="/profile">
               <img

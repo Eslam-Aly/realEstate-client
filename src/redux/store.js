@@ -2,9 +2,13 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import userReducer from "../redux/user/userSlice";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import favoritesReducer from "./user/favoritesSlice.js";
+import { enableMapSet } from "immer";
+enableMapSet();
 
 const rootReducer = combineReducers({
   user: userReducer,
+  favorites: favoritesReducer,
 });
 
 const persistConfig = {

@@ -1,0 +1,42 @@
+{
+  "nav": { "home": "Home", "favorites": "Favorites", "profile": "Profile" },
+  "search": {
+    "title": "Find your perfect property",
+    "governorate": "Governorate",
+    "city": "City",
+    "type": "Property Type",
+    "purpose": "Purpose",
+    "all": "All",
+    "rent": "Rent",
+    "sale": "Sale",
+    "search": "Search",
+    "reset": "Reset"
+  },
+  "listing": {
+    "forRent": "For Rent",
+    "forSale": "For Sale",
+    "negotiable": "Negotiable",
+    "beds": "beds",
+    "baths": "baths",
+    "sizeUnit": "sqm",
+    "price": "EGP",
+    "listedBy": "Listed by",
+    "seeMoreFromSeller": "See more from this seller",
+    "propertyTypes": {
+      "apartment": "Apartment",
+      "villa": "Villa",
+      "duplex": "Duplex",
+      "studio": "Studio",
+      "land": "Land",
+      "shop": "Shop",
+      "office": "Office",
+      "warehouse": "Warehouse",
+      "building": "Building",
+      "other": "Other"
+    }
+  },
+  "favorites": {
+    "title": "Your Favorite Listings",
+    "empty": "No favorites yet."
+  }
+}

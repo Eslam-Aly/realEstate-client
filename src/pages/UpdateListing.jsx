@@ -57,6 +57,7 @@ const FIELD_DEFS = {
   },
   furnished: { label: "Furnished", type: "checkbox" },
   parking: { label: "Parking", type: "checkbox" },
+  negotiable: { label: "Negotiable", type: "checkbox" },
 
   plotArea: {
     label: "Plot Area (sqm)",
@@ -236,10 +237,10 @@ export default function UpdateListing() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileRef = useRef(null);
 
-  const visibleFields = useMemo(
-    () => FIELDS_BY_CATEGORY[category] ?? [],
-    [category]
-  );
+  const visibleFields = useMemo(() => {
+    const base = FIELDS_BY_CATEGORY[category] ?? [];
+    return Array.from(new Set([...base, "negotiable"]));
+  }, [category]);
 
   const onChange = (key, value, def = FIELD_DEFS[key]) => {
     let v = value;
@@ -340,6 +341,7 @@ export default function UpdateListing() {
           elevator: data.building?.elevator ?? false,
           landArea: data.building?.landArea ?? "",
           buildYear: data.building?.buildYear ?? "",
+          negotiable: Boolean(data.negotiable),
         };
         setForm(f);
       } catch (e) {
@@ -555,7 +557,7 @@ export default function UpdateListing() {
 
       {/* Dynamic fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {(FIELDS_BY_CATEGORY[category] ?? []).map((key) => {
+        {visibleFields.map((key) => {
           const def = FIELD_DEFS[key];
           const v = def.type === "checkbox" ? !!form[key] : form[key] ?? "";
 

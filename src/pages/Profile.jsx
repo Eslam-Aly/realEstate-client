@@ -21,6 +21,7 @@ import {
 } from "../redux/user/userSlice.js";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import ListingItems from "../components/ListingItems.jsx";
 
 function Profile() {
   const dispatch = useDispatch();
@@ -35,6 +36,9 @@ function Profile() {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [showListingsError, setShowListingsError] = useState(false);
   const [showListings, setShowListings] = useState([]);
+  const [favPreview, setFavPreview] = useState([]);
+  const [favLoading, setFavLoading] = useState(false);
+  const [favError, setFavError] = useState("");
 
   useEffect(() => {
     if (file) {
@@ -42,6 +46,42 @@ function Profile() {
       handleFileUpload(file);
     }
   }, [file]);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        setFavLoading(true);
+        setFavError("");
+        const res = await fetch(`/api/favorites?limit=6`, {
+          headers: authHeaders(),
+        });
+        if (!res.ok) throw new Error(`Favorites fetch failed (${res.status})`);
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : data?.results || [];
+        if (alive) setFavPreview(list);
+      } catch (e) {
+        if (alive) setFavError(e.message || "Failed to load favorites");
+      } finally {
+        if (alive) setFavLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser?._id) return;
+    handleShowListings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?._id]);
+
+  const authHeaders = () => {
+    const token =
+      localStorage.getItem("token") || localStorage.getItem("access_token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
 
   const handleFileUpload = (file) => {
     const storage = getStorage(app);
@@ -169,7 +209,7 @@ function Profile() {
   };
 
   return (
-    <div>
+    <div className="pb-12">
       <h1 className="text-3xl text-center font-semibold my-7">Profile</h1>
       <form
         onSubmit={handleSubmit}
@@ -182,11 +222,11 @@ function Profile() {
           hidden
           accept="image/*"
         />
-        <div className="relative w-26 h-26 mx-auto">
+        <div className="relative mx-auto w-28 h-28">
           <img
             src={formData.avatar || currentUser.avatar}
             alt="avatar"
-            className=" rounded-full  object-cover"
+            className="w-28 h-28 rounded-full object-cover ring-1 ring-slate-200"
           />
           <button
             type="button"
@@ -273,51 +313,87 @@ function Profile() {
         >
           Sign Out
         </button>
-        <button
-          onClick={handleShowListings}
-          className="  text-green-600 p-3 rounded-lg font-semibold hover:underline transition cursor-pointer"
-        >
-          Show Listings
-        </button>
       </div>
-      {showListingsError && (
-        <p className="text-red-500 text-center mt-5 max-w-lg mx-auto">
-          Error fetching listings
-        </p>
-      )}
-      {showListings.length > 0 &&
-        showListings.map((listing) => (
-          <div
-            key={listing._id}
-            className="mt-5 max-w-lg mx-auto border p-4 rounded-lg space-y-4"
+      {/* Favorites preview */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-slate-800">
+            Your Favorites
+          </h2>
+          <Link
+            to="/favorites"
+            className="text-blue-700 hover:underline text-sm"
           >
-            <a
-              href={`/listing/${listing._id}`}
-              className="text-lg font-semibold hover:underline block"
-            >
-              {listing.title}
-            </a>
-            <img
-              src={listing.images[0]}
-              alt="listing image"
-              className="w-full h-64 object-cover rounded-md"
-            />
+            See all
+          </Link>
+        </div>
 
-            <div className=" flex justify-between">
-              <button
-                onClick={() => handleDeleteListing(listing._id)}
-                className="text-white hover:bg-red-500 w-24 h-10 bg-red-600 rounded-lg cursor-pointer"
-              >
-                Delete
-              </button>
-              <Link to={`/update-listing/${listing._id}`}>
-                <button className="text-white hover:bg-blue-500 w-24 h-10 bg-blue-600 rounded-lg cursor-pointer">
-                  Edit
-                </button>
-              </Link>
-            </div>
+        {favLoading ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-[220px] w-full bg-slate-100 rounded-xl animate-pulse"
+              />
+            ))}
           </div>
-        ))}
+        ) : favError ? (
+          <p className="text-red-600 text-sm">{favError}</p>
+        ) : favPreview.length === 0 ? (
+          <p className="text-slate-500 text-sm">You have no favorites yet.</p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {favPreview.map((l) => (
+              <ListingItems key={l._id || l.id} listing={l} />
+            ))}
+          </div>
+        )}
+      </section>
+      {/* Your Listings grid */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-slate-800">
+            Your Listings
+          </h2>
+          <span className="text-slate-500 text-sm">
+            {showListings.length}{" "}
+            {showListings.length === 1 ? "listing" : "listings"}
+          </span>
+        </div>
+
+        {showListingsError && (
+          <p className="text-red-600 text-sm mb-4">
+            Error fetching your listings.
+          </p>
+        )}
+
+        {showListings.length === 0 ? (
+          <p className="text-slate-500 text-sm">
+            You haven’t created any listings yet.
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {showListings.map((l) => (
+              <div key={l._id} className="group">
+                <ListingItems listing={l} />
+                <div className="mt-2 flex gap-2 w-[94%]">
+                  <Link to={`/update-listing/${l._id}`} className="flex-1">
+                    <button className="w-full py-2 rounded-md text-white bg-blue-700 hover:bg-blue-600 transition">
+                      Edit
+                    </button>
+                  </Link>
+                  <button
+                    onClick={() => handleDeleteListing(l._id)}
+                    className="flex-1 py-2 rounded-md text-white bg-red-600 hover:bg-red-500 transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

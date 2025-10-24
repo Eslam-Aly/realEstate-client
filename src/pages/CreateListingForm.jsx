@@ -43,6 +43,7 @@ const FIELD_DEFS = {
   },
   price: { label: "Price", type: "number", min: 0, required: true },
   size: { label: "Size (sqm)", type: "number", min: 0 },
+  negotiable: { label: "Negotiable", type: "checkbox" },
 
   // residential-only
   bedrooms: {
@@ -285,10 +286,11 @@ export default function CreateListingForm() {
   }, [selectedGov]);
 
   // 4) compute which fields to render
-  const visibleFields = useMemo(
-    () => FIELDS_BY_CATEGORY[category] ?? [],
-    [category]
-  );
+  const visibleFields = useMemo(() => {
+    const base = FIELDS_BY_CATEGORY[category] ?? [];
+    // ensure Negotiable shows for all categories (deduped)
+    return Array.from(new Set([...base, "negotiable"]));
+  }, [category]);
 
   const onChange = (key, value, def = FIELD_DEFS[key]) => {
     let v = value;
@@ -519,7 +521,7 @@ export default function CreateListingForm() {
             return (
               <div
                 key={key}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:col-span-2"
+                className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:col-span-2 "
               >
                 {/* Governorate */}
                 <label className="flex flex-col gap-1">

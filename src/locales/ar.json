@@ -1,0 +1,46 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "favorites": "المفضلة",
+    "profile": "الملف الشخصي"
+  },
+  "search": {
+    "title": "ابحث عن العقار المثالي",
+    "governorate": "المحافظة",
+    "city": "المدينة",
+    "type": "نوع العقار",
+    "purpose": "الغرض",
+    "all": "الكل",
+    "rent": "إيجار",
+    "sale": "بيع",
+    "search": "بحث",
+    "reset": "إعادة التعيين"
+  },
+  "listing": {
+    "forRent": "للإيجار",
+    "forSale": "للبيع",
+    "negotiable": "قابل للتفاوض",
+    "beds": "غرف",
+    "baths": "حمامات",
+    "sizeUnit": "م²",
+    "price": "ج.م",
+    "listedBy": "مُعلن بواسطة",
+    "seeMoreFromSeller": "عرض المزيد من هذا المُعلن",
+    "propertyTypes": {
+      "apartment": "شقة",
+      "villa": "فيلا",
+      "duplex": "دوبلكس",
+      "studio": "استوديو",
+      "land": "أرض",
+      "shop": "محل",
+      "office": "مكتب",
+      "warehouse": "مخزن",
+      "building": "مبنى",
+      "other": "أخرى"
+    }
+  },
+  "favorites": {
+    "title": "إعلاناتك المفضلة",
+    "empty": "لا توجد مفضلات بعد."
+  }
+}
