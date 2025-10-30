@@ -17,7 +17,7 @@ function Search() {
     governorate: "", // slug
     city: "", // slug
     area: "",
-    area: "", // slug
+
     purpose: "all", // UI field: all | rent | sale
     type: "all", // UI field: all | apartment | villa | commercial | land | building
     parking: false,
@@ -70,7 +70,6 @@ function Search() {
       searchTerm: searchTermFromUrl,
       governorate: governorateFromUrl,
       city: cityFromUrl,
-      area: areaFromUrl,
       area: areaFromUrl,
       purpose: purposeFromUrl,
       type: baseTypeFromUrl,

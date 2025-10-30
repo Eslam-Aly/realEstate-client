@@ -11,7 +11,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
-import { set } from "mongoose";
+
 import API from "../../api/index.js";
 
 const DEFAULT_IMAGE_URL =
