@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import ListingItems from "../components/ListingItems.jsx";
 import { useTranslation } from "react-i18next";
+import API from "../../api/index.js";
 
 function Search() {
   const navigate = useNavigate();
@@ -104,8 +105,8 @@ function Search() {
         }
         const searchQuery = params.toString();
         const endpoint = searchQuery
-          ? `/api/listings/get?${searchQuery}`
-          : `/api/listings/get`;
+          ? `${API}/listings/get?${searchQuery}`
+          : `${API}/listings/get`;
         console.log("Fetching from:", endpoint);
         const response = await fetch(endpoint);
         const data = await response.json();
@@ -125,7 +126,7 @@ function Search() {
   // Fetch governorates on mount and when language changes
   useEffect(() => {
     let active = true;
-    fetch(`/api/locations/governorates?lang=${langParam}`)
+    fetch(`${API}/locations/governorates?lang=${langParam}`)
       .then((r) => r.json())
       .then((data) => {
         if (!active) return;
@@ -149,7 +150,7 @@ function Search() {
       return;
     }
     fetch(
-      `/api/locations/governorates/${sidebarData.governorate}/cities?lang=${langParam}`
+      `${API}/locations/governorates/${sidebarData.governorate}/cities?lang=${langParam}`
     )
       .then((r) => r.json())
       .then((data) => {
@@ -184,7 +185,7 @@ function Search() {
       return;
     }
     fetch(
-      `/api/locations/governorates/${sidebarData.governorate}/cities/${sidebarData.city}/areas?lang=${langParam}`
+      `${API}/locations/governorates/${sidebarData.governorate}/cities/${sidebarData.city}/areas?lang=${langParam}`
     )
       .then((r) => r.json())
       .then((data) => {

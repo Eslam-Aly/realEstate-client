@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import ListingItems from "../components/ListingItems";
 import heroImage from "../assets/hero.jpg";
 import { useTranslation } from "react-i18next";
+import API from "../../api/index.js";
 
 function Home() {
   const { t, i18n } = useTranslation();
@@ -34,11 +35,11 @@ function Home() {
       try {
         setLoading(true);
         const urls = [
-          "/api/listings/get?limit=6&sort=createdAt&order=desc",
-          "/api/listings/get?purpose=rent&type=rent&category=apartment&limit=6&sort=createdAt&order=desc",
-          "/api/listings/get?purpose=sale&type=sale&category=apartment&limit=6&sort=createdAt&order=desc",
-          "/api/listings/get?purpose=rent&type=rent&category=villa&limit=6&sort=createdAt&order=desc",
-          "/api/listings/get?purpose=sale&type=sale&category=villa&limit=6&sort=createdAt&order=desc",
+          `${API}/listings/get?limit=6&sort=createdAt&order=desc`,
+          `${API}/listings/get?purpose=rent&type=rent&category=apartment&limit=6&sort=createdAt&order=desc`,
+          `${API}/listings/get?purpose=sale&type=sale&category=apartment&limit=6&sort=createdAt&order=desc`,
+          `${API}/listings/get?purpose=rent&type=rent&category=villa&limit=6&sort=createdAt&order=desc`,
+          `${API}/listings/get?purpose=sale&type=sale&category=villa&limit=6&sort=createdAt&order=desc`,
         ];
         const resps = await Promise.all(urls.map((u) => fetch(u)));
         const jsons = await Promise.all(resps.map((r) => r.json()));
@@ -64,7 +65,7 @@ function Home() {
     let alive = true;
     (async () => {
       try {
-        const res = await fetch("/api/locations/governorates");
+        const res = await fetch(`${API}/locations/governorates`);
         const data = await res.json();
         if (!alive) return;
         setGovs(Array.isArray(data) ? data : []);
@@ -86,9 +87,7 @@ function Home() {
     }
     (async () => {
       try {
-        const res = await fetch(
-          `/api/locations/governorates/${govSlug}/cities`
-        );
+        const res = await fetch(`${API}/locations/governorates/${govSlug}/cities`);
         const data = await res.json();
         if (!alive) return;
         // Accept several possible shapes from the API and normalize

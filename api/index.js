@@ -1,2 +1,3 @@
-import app from "../../api/index.js"; // points to your real backend Express app
-export default app;
+const API = import.meta.env.VITE_API_BASE;
+
+export default API;

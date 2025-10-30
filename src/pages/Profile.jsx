@@ -23,6 +23,7 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import ListingItems from "../components/ListingItems.jsx";
 import { useTranslation } from "react-i18next";
+import API from "../../api/index.js";
 
 function Profile() {
   const { t } = useTranslation();
@@ -56,7 +57,7 @@ function Profile() {
       try {
         setFavLoading(true);
         setFavError("");
-        const res = await fetch(`/api/favorites?limit=6`, {
+        const res = await fetch(`${API}/favorites?limit=6`, {
           headers: authHeaders(),
         });
         if (!res.ok) throw new Error(`Favorites fetch failed (${res.status})`);
@@ -123,7 +124,7 @@ function Profile() {
     e.preventDefault();
     try {
       dispatch(updateUserStart());
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+      const res = await fetch(`${API}/user/update/${currentUser._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -144,7 +145,7 @@ function Profile() {
   const handleDeleteUser = async () => {
     try {
       dispatch(deleteUserStart());
-      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+      const res = await fetch(`${API}/user/delete/${currentUser._id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -160,7 +161,7 @@ function Profile() {
   const handleSignOut = async () => {
     try {
       dispatch(signOutStart());
-      const res = await fetch(`/api/auth/signout`);
+      const res = await fetch(`${API}/auth/signout`);
       const data = await res.json();
       if (data.success === false) {
         dispatch(signOutFaliure(data.message));
@@ -174,7 +175,7 @@ function Profile() {
   const handleShowListings = async () => {
     try {
       setShowListingsError(false);
-      const res = await fetch(`/api/user/listings/${currentUser._id}`);
+      const res = await fetch(`${API}/user/listings/${currentUser._id}`);
       console.log(res);
       console.log(currentUser._id);
       const data = await res.json();
@@ -195,7 +196,7 @@ function Profile() {
         localStorage.getItem("token") ||
         localStorage.getItem("access_token") ||
         "";
-      const res = await fetch(`/api/listings/delete/${listingId}`, {
+      const res = await fetch(`${API}/listings/delete/${listingId}`, {
         method: "DELETE",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });

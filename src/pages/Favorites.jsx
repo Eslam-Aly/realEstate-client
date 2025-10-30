@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import ListingItems from "../components/ListingItems.jsx";
+import API from "../../api/index.js";
 
 /**
  * Lists the current user's saved listings. Anonymous visitors are redirected
@@ -23,7 +24,7 @@ export default function Favorites() {
     (async () => {
       try {
         setL(true);
-        const res = await fetch("/api/favorites?limit=24", {
+        const res = await fetch(`${API}/favorites?limit=24`, {
           credentials: "include",
         });
         if (res.status === 401) {

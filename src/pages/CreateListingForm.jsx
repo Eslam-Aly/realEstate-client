@@ -2,6 +2,7 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import API from "../../api/index.js";
 
 const DEFAULT_IMAGE_URL =
   import.meta?.env?.VITE_DEFAULT_LISTING_IMAGE || "/placeholder.jpg";
@@ -312,7 +313,7 @@ export default function CreateListingForm() {
   // Fetch governorates on mount & language change
   useEffect(() => {
     let active = true;
-    fetch(`/api/locations/governorates?lang=${langParam}`)
+    fetch(`${API}/locations/governorates?lang=${langParam}`)
       .then((r) => r.json())
       .then((data) => {
         if (!active) return;
@@ -346,7 +347,7 @@ export default function CreateListingForm() {
       return;
     }
     fetch(
-      `/api/locations/governorates/${selectedGov.slug}/cities?lang=${langParam}`
+      `${API}/locations/governorates/${selectedGov.slug}/cities?lang=${langParam}`
     )
       .then((r) => r.json())
       .then((data) => {
@@ -383,7 +384,7 @@ export default function CreateListingForm() {
       };
     }
     fetch(
-      `/api/locations/governorates/${selectedGov.slug}/cities/${selectedCity.slug}/areas?lang=${langParam}`
+      `${API}/locations/governorates/${selectedGov.slug}/cities/${selectedCity.slug}/areas?lang=${langParam}`
     )
       .then((r) => r.json())
       .then((data) => {
@@ -439,7 +440,6 @@ export default function CreateListingForm() {
     setForm((p) => ({ ...p, [key]: v }));
   };
 
-  const API_BASE = import.meta?.env?.VITE_API_BASE || "/api";
   const getToken = () =>
     localStorage.getItem("token") || localStorage.getItem("access_token") || "";
 
@@ -591,7 +591,7 @@ export default function CreateListingForm() {
 
     try {
       setSubmitting(true);
-      const res = await fetch(`${API_BASE}/listings/create`, {
+      const res = await fetch(`${API}/listings/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

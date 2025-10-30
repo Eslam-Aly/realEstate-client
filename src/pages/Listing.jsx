@@ -32,6 +32,7 @@ import {
 } from "react-icons/fa";
 import { LuMessageCircleMore } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
+import API from "../../api/index.js";
 function Listing() {
   // --- Language-aware location rendering ---
   const { t, i18n } = useTranslation();
@@ -301,7 +302,7 @@ function Listing() {
         localStorage.getItem("token") ||
         localStorage.getItem("access_token") ||
         "";
-      const res = await fetch(`/api/listings/delete/${listing._id}`, {
+      const res = await fetch(`${API}/listings/delete/${listing._id}`, {
         method: "DELETE",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -333,7 +334,7 @@ function Listing() {
       const query = params.toString();
       setSimilarQuery(query.replace(/(&|^)limit=\d+/, "").replace(/^&/, ""));
       setSimilarLoading(true);
-      const res = await fetch(`/api/listings/get?${query}`);
+      const res = await fetch(`${API}/listings/get?${query}`);
       const data = await res.json();
       const list = Array.isArray(data) ? data : data?.results || [];
       const currentId = String(item?._id || "");
@@ -352,7 +353,7 @@ function Listing() {
     if (!userId) return;
     try {
       setOwnerLoading(true);
-      const res = await fetch(`/api/user/public/${userId}`);
+      const res = await fetch(`${API}/user/public/${userId}`);
       if (!res.ok) throw new Error("Owner not available");
       const data = await res.json();
       setOwner(data || null);
@@ -374,7 +375,7 @@ function Listing() {
           return;
         }
         setLoading(true);
-        const res = await fetch(`/api/listings/get/${createdId}`);
+        const res = await fetch(`${API}/listings/get/${createdId}`);
         const data = await res.json();
         if (data.success === false) {
           setError(true);

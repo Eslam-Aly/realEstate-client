@@ -12,10 +12,10 @@ import {
 } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import { set } from "mongoose";
+import API from "../../api/index.js";
 
 const DEFAULT_IMAGE_URL =
   import.meta?.env?.VITE_DEFAULT_LISTING_IMAGE || "/placeholder.jpg";
-const API_BASE = import.meta?.env?.VITE_API_BASE || "/api";
 const getToken = () =>
   localStorage.getItem("token") || localStorage.getItem("access_token") || "";
 
@@ -346,7 +346,7 @@ export default function UpdateListing() {
   // Load governorates on mount & language change
   useEffect(() => {
     let active = true;
-    fetch(`/api/locations/governorates?lang=${langParam}`)
+    fetch(`${API}/locations/governorates?lang=${langParam}`)
       .then((r) => r.json())
       .then((data) => {
         if (!active) return;
@@ -375,7 +375,7 @@ export default function UpdateListing() {
     (async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE}/listings/get/${id}`);
+        const res = await fetch(`${API}/listings/get/${id}`);
         const data = await res.json();
         if (!res.ok || data?.success === false)
           throw new Error(
@@ -407,7 +407,7 @@ export default function UpdateListing() {
 
         if (gov?.slug) {
           const resCities = await fetch(
-            `/api/locations/governorates/${gov.slug}/cities?lang=${langParam}`
+            `${API}/locations/governorates/${gov.slug}/cities?lang=${langParam}`
           );
           const cityPayload = await resCities.json();
           const list = Array.isArray(cityPayload?.cities)
@@ -435,7 +435,7 @@ export default function UpdateListing() {
             if (gov?.slug && city?.slug && area?.slug) {
               try {
                 const resAreas = await fetch(
-                  `/api/locations/governorates/${gov.slug}/cities/${city.slug}/areas?lang=${langParam}`
+                  `${API}/locations/governorates/${gov.slug}/cities/${city.slug}/areas?lang=${langParam}`
                 );
                 const areaPayload = await resAreas.json();
                 const areasList = Array.isArray(areaPayload?.areas)
@@ -508,7 +508,7 @@ export default function UpdateListing() {
       return;
     }
     fetch(
-      `/api/locations/governorates/${selectedGov.slug}/cities?lang=${langParam}`
+      `${API}/locations/governorates/${selectedGov.slug}/cities?lang=${langParam}`
     )
       .then((r) => r.json())
       .then((data) => {
@@ -542,7 +542,7 @@ export default function UpdateListing() {
       };
     }
     fetch(
-      `/api/locations/governorates/${selectedGov.slug}/cities/${selectedCity.slug}/areas?lang=${langParam}`
+      `${API}/locations/governorates/${selectedGov.slug}/cities/${selectedCity.slug}/areas?lang=${langParam}`
     )
       .then((r) => r.json())
       .then((data) => {
@@ -698,17 +698,14 @@ export default function UpdateListing() {
 
     try {
       setLoading(true);
-      const res = await fetch(
-        `${API_BASE}/listings/update/${params.listingId}`,
-        {
-          method: "PATCH", // your routes use PATCH for update
-          headers: {
-            "Content-Type": "application/json",
-            ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = await fetch(`${API}/listings/update/${params.listingId}`, {
+        method: "PATCH", // your routes use PATCH for update
+        headers: {
+          "Content-Type": "application/json",
+          ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.success === false)
         throw new Error(data?.message || t("updateListing.messages.error"));

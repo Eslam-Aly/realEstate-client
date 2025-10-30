@@ -3,17 +3,18 @@ import { app } from "../firebase.js";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice.js";
 import { useNavigate } from "react-router-dom";
+import API from "../../api/index.js";
 
 function OAuth() {
   const navigate = useNavigate();
-  const dispach = useDispatch();
+  const dispatch = useDispatch();
   const handleGoogleClick = async () => {
     try {
       const provider = new GoogleAuthProvider();
       const auth = getAuth(app);
 
       const result = await signInWithPopup(auth, provider);
-      const res = await fetch("/api/auth/google", {
+      const res = await fetch(`${API}/auth/google`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -25,7 +26,7 @@ function OAuth() {
         }),
       });
       const data = await res.json();
-      dispach(signInSuccess(data));
+      dispatch(signInSuccess(data));
       navigate("/");
     } catch (error) {
       console.log("could not sign in with Google", error);
