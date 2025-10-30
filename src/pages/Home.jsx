@@ -6,7 +6,7 @@ import heroImage from "../assets/hero.jpg";
 import { useTranslation } from "react-i18next";
 
 function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [listings, setListings] = useState([]);
   const [aptRent, setAptRent] = useState([]);
   const [aptSale, setAptSale] = useState([]);
@@ -20,6 +20,13 @@ function Home() {
   const [govSlug, setGovSlug] = useState("");
   const [citySlug, setCitySlug] = useState("");
   const navigate = useNavigate();
+
+  // Determine language and pick the correct display field
+  const isAr = i18n?.language?.startsWith("ar");
+  const getDisplayName = (obj) => {
+    if (!obj) return "";
+    return isAr && obj.nameAr ? obj.nameAr : obj.name;
+  };
 
   useEffect(() => {
     let alive = true;
@@ -79,10 +86,37 @@ function Home() {
     }
     (async () => {
       try {
-        const res = await fetch(`/api/locations/cities/${govSlug}`);
+        const res = await fetch(
+          `/api/locations/governorates/${govSlug}/cities`
+        );
         const data = await res.json();
         if (!alive) return;
-        setCities(Array.isArray(data) ? data : []);
+        // Accept several possible shapes from the API and normalize
+        const arr = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.cities)
+          ? data.cities
+          : Array.isArray(data?.results)
+          ? data.results
+          : [];
+
+        const normalized = arr
+          .filter((c) => c && (c.slug || c?.en?.slug))
+          .map((c) =>
+            c.slug
+              ? {
+                  name: c.name || c.city_en || c.en,
+                  nameAr: c.nameAr || c.city_ar || c.ar,
+                  slug: c.slug,
+                }
+              : {
+                  name: c.en?.name || c.en || "",
+                  nameAr: c.ar?.name || c.ar || "",
+                  slug: c.en?.slug || "",
+                }
+          );
+
+        setCities(normalized);
       } catch (e) {
         setCities([]);
       }
@@ -123,7 +157,7 @@ function Home() {
 
         {/* Content (top-left) */}
         <div className="mx-auto max-w-7xl px-5 pt-16 md:px-10 md:pt-24">
-          <h1 className="max-w-xl text-4xl font-extrabold leading-tight tracking-tight text-white drop-shadow md:text-6xl">
+          <h1 className="max-w-xl text-4xl font-extrabold leading-tight tracking-tight text-white drop-shadow md:text-6xl my-12">
             {t("search.title")}
           </h1>
 
@@ -145,9 +179,9 @@ function Home() {
                     value={purpose}
                     onChange={(e) => setPurpose(e.target.value)}
                   >
-                    <option value="all">All</option>
-                    <option value="rent">Rent</option>
-                    <option value="sale">Sale</option>
+                    <option value="all">{t("search.all")}</option>
+                    <option value="rent">{t("search.rent")}</option>
+                    <option value="sale">{t("search.sale")}</option>
                   </select>
                 </label>
 
@@ -162,17 +196,37 @@ function Home() {
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                   >
-                    <option value="">Any</option>
-                    <option value="apartment">Apartment</option>
-                    <option value="villa">Villa</option>
-                    <option value="duplex">Duplex</option>
-                    <option value="studio">Studio</option>
-                    <option value="land">Land</option>
-                    <option value="shop">Shop</option>
-                    <option value="office">Office</option>
-                    <option value="warehouse">Warehouse</option>
-                    <option value="building">Building</option>
-                    <option value="other">Other</option>
+                    <option value="">{t("search.all")}</option>
+                    <option value="apartment">
+                      {t("listing.propertyTypes.apartment")}
+                    </option>
+                    <option value="villa">
+                      {t("listing.propertyTypes.villa")}
+                    </option>
+                    <option value="duplex">
+                      {t("listing.propertyTypes.duplex")}
+                    </option>
+                    <option value="studio">
+                      {t("listing.propertyTypes.studio")}
+                    </option>
+                    <option value="land">
+                      {t("listing.propertyTypes.land")}
+                    </option>
+                    <option value="shop">
+                      {t("listing.propertyTypes.shop")}
+                    </option>
+                    <option value="office">
+                      {t("listing.propertyTypes.office")}
+                    </option>
+                    <option value="warehouse">
+                      {t("listing.propertyTypes.warehouse")}
+                    </option>
+                    <option value="building">
+                      {t("listing.propertyTypes.building")}
+                    </option>
+                    <option value="other">
+                      {t("listing.propertyTypes.other")}
+                    </option>
                   </select>
                 </label>
 
@@ -185,12 +239,15 @@ function Home() {
                     aria-label="Governorate"
                     className="w-full appearance-none bg-transparent text-sm outline-none cursor-pointer"
                     value={govSlug}
-                    onChange={(e) => setGovSlug(e.target.value)}
+                    onChange={(e) => {
+                      setGovSlug(e.target.value);
+                      setCitySlug("");
+                    }}
                   >
-                    <option value="">Any</option>
+                    <option value="">{t("search.all")}</option>
                     {govs.map((g) => (
                       <option key={g.slug} value={g.slug}>
-                        {g.name}
+                        {getDisplayName(g)}
                       </option>
                     ))}
                   </select>
@@ -209,11 +266,11 @@ function Home() {
                     disabled={!govSlug}
                   >
                     <option value="">
-                      {govSlug ? "Any" : "Select governorate first"}
+                      {govSlug ? t("search.all") : t("search.selectGovFirst")}
                     </option>
                     {cities.map((c) => (
                       <option key={c.slug} value={c.slug}>
-                        {c.name}
+                        {getDisplayName(c)}
                       </option>
                     ))}
                   </select>
@@ -235,7 +292,7 @@ function Home() {
       {/* Listings Sections */}
       <section className="max-w-6xl mx-auto p-3 md:p-6 flex flex-col gap-8 my-10">
         {loading ? (
-          <div className="text-center text-gray-500">Loading listings...</div>
+          <div className="text-center text-gray-500">{t("search.loading")}</div>
         ) : (
           <>
             {/* Recent Listings (all) */}
@@ -243,13 +300,13 @@ function Home() {
               <div>
                 <div className="my-3">
                   <h2 className="text-2xl font-semibold text-slate-600">
-                    Recent listings
+                    {t("search.recentListing")}
                   </h2>
                   <Link
                     className="text-sm text-blue-800 hover:underline"
                     to={"/search?sort=createdAt&order=desc"}
                   >
-                    Show more listings
+                    {t("search.showMoreListings")}
                   </Link>
                 </div>
                 <div className="flex flex-wrap gap-4">
@@ -265,7 +322,7 @@ function Home() {
               <div>
                 <div className="my-3">
                   <h2 className="text-2xl font-semibold text-slate-600">
-                    Recent apartments for rent
+                    {t("search.recentApartmentsForRent")}
                   </h2>
                   <Link
                     className="text-sm text-blue-800 hover:underline"
@@ -273,7 +330,7 @@ function Home() {
                       "/search?purpose=rent&type=rent&category=apartment&sort=createdAt&order=desc"
                     }
                   >
-                    Show more apartments for rent
+                    {t("search.showMoreApartmentsForRent")}
                   </Link>
                 </div>
                 <div className="flex flex-wrap gap-4">
@@ -289,7 +346,7 @@ function Home() {
               <div>
                 <div className="my-3">
                   <h2 className="text-2xl font-semibold text-slate-600">
-                    Recent apartments for sale
+                    {t("search.recentApartmentsForSale")}
                   </h2>
                   <Link
                     className="text-sm text-blue-800 hover:underline"
@@ -297,7 +354,7 @@ function Home() {
                       "/search?purpose=sale&type=sale&category=apartment&sort=createdAt&order=desc"
                     }
                   >
-                    Show more apartments for sale
+                    {t("search.showMoreApartmentsForSale")}
                   </Link>
                 </div>
                 <div className="flex flex-wrap gap-4">
@@ -313,7 +370,7 @@ function Home() {
               <div>
                 <div className="my-3">
                   <h2 className="text-2xl font-semibold text-slate-600">
-                    Recent villas for rent
+                    {t("search.recentVillasForRent")}
                   </h2>
                   <Link
                     className="text-sm text-blue-800 hover:underline"
@@ -321,7 +378,7 @@ function Home() {
                       "/search?purpose=rent&type=rent&category=villa&sort=createdAt&order=desc"
                     }
                   >
-                    Show more villas for rent
+                    {t("search.showMoreVillasForRent")}
                   </Link>
                 </div>
                 <div className="flex flex-wrap gap-4">
@@ -337,7 +394,7 @@ function Home() {
               <div>
                 <div className="my-3">
                   <h2 className="text-2xl font-semibold text-slate-600">
-                    Recent villas for sale
+                    {t("search.recentVillasForSale")}
                   </h2>
                   <Link
                     className="text-sm text-blue-800 hover:underline"
@@ -345,7 +402,7 @@ function Home() {
                       "/search?purpose=sale&type=sale&category=villa&sort=createdAt&order=desc"
                     }
                   >
-                    Show more villas for sale
+                    {t("search.showMoreVillasForSale")}
                   </Link>
                 </div>
                 <div className="flex flex-wrap gap-4">

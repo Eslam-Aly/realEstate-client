@@ -1,6 +1,7 @@
 // Ensure you have client/public/placeholder.jpg available; set VITE_DEFAULT_LISTING_IMAGE to override in prod.
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const DEFAULT_IMAGE_URL =
   import.meta?.env?.VITE_DEFAULT_LISTING_IMAGE || "/placeholder.jpg";
@@ -15,9 +16,13 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { useSelector } from "react-redux";
 
-/** 1) Main selectors */
-const PURPOSES = ["rent", "sale"];
-const CATEGORIES = [
+/** 1) Option metadata */
+const PURPOSE_OPTIONS = [
+  { value: "rent", labelKey: "createListing.purpose.rent" },
+  { value: "sale", labelKey: "createListing.purpose.sale" },
+];
+
+const CATEGORY_OPTIONS = [
   "apartment",
   "villa",
   "duplex",
@@ -30,85 +35,128 @@ const CATEGORIES = [
   "other",
 ];
 
-/** 2) Field registry (one place to extend) */
-const FIELD_DEFS = {
+const ZONING_OPTIONS = [
+  "residential",
+  "commercial",
+  "agricultural",
+  "industrial",
+];
+
+const LICENSE_OPTIONS = [
+  "retail",
+  "office",
+  "restaurant",
+  "warehouse",
+  "clinic",
+  "other",
+];
+
+/** 2) Field registry (translation keys) */
+const FIELD_CONFIG = {
   // shared
-  title: { label: "Title", type: "text", required: true },
-  address: { label: "Address", type: "location" },
+  title: {
+    labelKey: "createListing.fields.title",
+    type: "text",
+    required: true,
+  },
+  address: { labelKey: "createListing.fields.address", type: "location" },
   description: {
-    label: "Description",
+    labelKey: "createListing.fields.description",
     type: "textarea",
     required: true,
-    placeholder: "Describe the property, nearby landmarks, terms, etc.",
+    placeholderKey: "createListing.fields.descriptionPlaceholder",
   },
-  price: { label: "Price", type: "number", min: 0, required: true },
-  size: { label: "Size (sqm)", type: "number", min: 0 },
-  negotiable: { label: "Negotiable", type: "checkbox" },
+  price: {
+    labelKey: "createListing.fields.price",
+    type: "number",
+    min: 0,
+    required: true,
+  },
+  size: { labelKey: "createListing.fields.size", type: "number", min: 0 },
+  negotiable: { labelKey: "createListing.fields.negotiable", type: "checkbox" },
 
   // residential-only
   bedrooms: {
-    label: "Bedrooms",
+    labelKey: "createListing.fields.bedrooms",
     type: "select",
     options: [
       0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
     ],
   },
   bathrooms: {
-    label: "Bathrooms",
+    labelKey: "createListing.fields.bathrooms",
     type: "select",
     options: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
   },
   floor: {
-    label: "Floor",
+    labelKey: "createListing.fields.floor",
     type: "select",
     options: Array.from({ length: 51 }, (_, i) => i),
   },
-  furnished: { label: "Furnished", type: "checkbox" },
-  parking: { label: "Parking", type: "checkbox" },
+  furnished: { labelKey: "createListing.fields.furnished", type: "checkbox" },
+  parking: { labelKey: "createListing.fields.parking", type: "checkbox" },
 
   // land-only
   plotArea: {
-    label: "Plot Area (sqm)",
+    labelKey: "createListing.fields.plotArea",
     type: "number",
     min: 0,
     required: true,
   },
-  frontage: { label: "Frontage (m)", type: "number", min: 0 },
-  zoning: {
-    label: "Zoning",
-    type: "select",
-    options: ["residential", "commercial", "agricultural", "industrial"],
+  frontage: {
+    labelKey: "createListing.fields.frontage",
+    type: "number",
+    min: 0,
   },
-  cornerLot: { label: "Corner Lot", type: "checkbox" },
+  zoning: {
+    labelKey: "createListing.fields.zoning",
+    type: "select",
+    options: ZONING_OPTIONS,
+  },
+  cornerLot: { labelKey: "createListing.fields.cornerLot", type: "checkbox" },
 
   // commercial-only
   floorArea: {
-    label: "Floor Area (sqm)",
+    labelKey: "createListing.fields.floorArea",
     type: "number",
     min: 0,
     required: true,
   },
   licenseType: {
-    label: "License Type",
+    labelKey: "createListing.fields.licenseType",
     type: "select",
-    options: ["retail", "office", "restaurant", "warehouse", "clinic", "other"],
+    options: LICENSE_OPTIONS,
   },
-  hasMezz: { label: "Mezzanine", type: "checkbox" },
-  parkingSpots: { label: "Parking Spots", type: "number", min: 0, step: 1 },
+  hasMezz: { labelKey: "createListing.fields.hasMezz", type: "checkbox" },
+  parkingSpots: {
+    labelKey: "createListing.fields.parkingSpots",
+    type: "number",
+    min: 0,
+    step: 1,
+  },
 
   // whole-building
   totalFloors: {
-    label: "Total Floors",
+    labelKey: "createListing.fields.totalFloors",
     type: "number",
     min: 1,
     step: 1,
     required: true,
   },
-  totalUnits: { label: "Total Units", type: "number", min: 1, step: 1 },
-  elevator: { label: "Elevator", type: "checkbox" },
-  landArea: { label: "Land Area (sqm)", type: "number", min: 0 },
+  totalUnits: {
+    labelKey: "createListing.fields.totalUnits",
+    type: "number",
+    min: 1,
+    step: 1,
+  },
+  elevator: { labelKey: "createListing.fields.elevator", type: "checkbox" },
+  landArea: {
+    labelKey: "createListing.fields.landArea",
+    type: "number",
+    min: 0,
+  },
   buildYear: {
-    label: "Build Year",
+    labelKey: "createListing.fields.buildYear",
     type: "number",
     min: 1900,
     max: new Date().getFullYear(),
@@ -218,9 +266,12 @@ const FIELDS_BY_CATEGORY = {
 };
 
 export default function CreateListingForm() {
+  const { t, i18n } = useTranslation();
+  const isAr = i18n?.language?.startsWith("ar");
+  const langParam = isAr ? "ar" : "en";
   const navigate = useNavigate();
-  const [purpose, setPurpose] = useState("rent");
-  const [category, setCategory] = useState("apartment");
+  const [purpose, setPurpose] = useState(PURPOSE_OPTIONS[0].value);
+  const [category, setCategory] = useState(CATEGORY_OPTIONS[0]);
   const [form, setForm] = useState({}); // all dynamic fields live here
 
   // Location (governorate/city) state
@@ -228,7 +279,20 @@ export default function CreateListingForm() {
   const [cities, setCities] = useState([]); // [{name, slug}]
   const [selectedGov, setSelectedGov] = useState(null); // {name, slug}
   const [selectedCity, setSelectedCity] = useState(null); // {name, slug}
+  const [areas, setAreas] = useState([]); // [{name, slug}]
+  const [selectedArea, setSelectedArea] = useState(null); // {name, slug}
+
   const [otherCityText, setOtherCityText] = useState("");
+
+  const getDisplayName = (item) =>
+    isAr && item?.nameAr ? item.nameAr : item?.name || "";
+
+  const getOptionLabel = (fieldKey, option) => {
+    if (typeof option === "number") return option;
+    return t(`createListing.options.${fieldKey}.${option}`, {
+      defaultValue: toTitle(option),
+    });
+  };
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -243,21 +307,32 @@ export default function CreateListingForm() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileRef = useRef(null);
+  const MAX_IMAGES = 6;
 
-  // Fetch governorates on mount
+  // Fetch governorates on mount & language change
   useEffect(() => {
     let active = true;
-    fetch("/api/locations/governorates")
+    fetch(`/api/locations/governorates?lang=${langParam}`)
       .then((r) => r.json())
       .then((data) => {
         if (!active) return;
-        setGovs(Array.isArray(data) ? data : []);
+        const list = Array.isArray(data) ? data : [];
+        setGovs(list);
+        setSelectedGov((prev) => {
+          if (!prev) return prev;
+          return list.find((g) => g.slug === prev.slug) || null;
+        });
       })
-      .catch(() => setGovs([]));
+      .catch(() => {
+        setGovs([]);
+        setSelectedGov(null);
+        setSelectedCity(null);
+        setOtherCityText("");
+      });
     return () => {
       active = false;
     };
-  }, []);
+  }, [langParam]);
 
   // Fetch cities when governorate changes
   useEffect(() => {
@@ -266,15 +341,26 @@ export default function CreateListingForm() {
       setCities([]);
       setSelectedCity(null);
       setOtherCityText("");
+      setAreas([]);
+      setSelectedArea(null);
       return;
     }
-    fetch(`/api/locations/cities/${selectedGov.slug}`)
+    fetch(
+      `/api/locations/governorates/${selectedGov.slug}/cities?lang=${langParam}`
+    )
       .then((r) => r.json())
       .then((data) => {
         if (!active) return;
-        setCities(Array.isArray(data) ? data : []);
-        setSelectedCity(null);
+        const list = Array.isArray(data?.cities) ? data.cities : [];
+        setCities(list);
+        setSelectedCity((prev) => {
+          if (!prev) return prev;
+          return list.find((c) => c.slug === prev.slug) || null;
+        });
         setOtherCityText("");
+        // reset areas
+        setAreas([]);
+        setSelectedArea(null);
       })
       .catch(() => {
         setCities([]);
@@ -283,16 +369,63 @@ export default function CreateListingForm() {
     return () => {
       active = false;
     };
-  }, [selectedGov]);
+  }, [selectedGov, langParam]);
+
+  // Fetch areas when city changes
+  useEffect(() => {
+    let active = true;
+    // If no city or city is "other", clear areas
+    if (!selectedGov || !selectedCity || selectedCity.slug === "other") {
+      setAreas([]);
+      setSelectedArea(null);
+      return () => {
+        active = false;
+      };
+    }
+    fetch(
+      `/api/locations/governorates/${selectedGov.slug}/cities/${selectedCity.slug}/areas?lang=${langParam}`
+    )
+      .then((r) => r.json())
+      .then((data) => {
+        if (!active) return;
+        const list = Array.isArray(data?.areas) ? data.areas : [];
+        setAreas(list);
+        setSelectedArea((prev) =>
+          prev
+            ? list.find((a) => String(a.slug) === String(prev.slug)) || null
+            : prev
+        );
+      })
+      .catch(() => {
+        setAreas([]);
+        setSelectedArea(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, [selectedGov?.slug, selectedCity?.slug, langParam]);
+
+  const fieldDefs = useMemo(() => {
+    const map = {};
+    Object.entries(FIELD_CONFIG).forEach(([key, def]) => {
+      map[key] = {
+        ...def,
+        label: t(def.labelKey),
+        placeholder: def.placeholderKey
+          ? t(def.placeholderKey)
+          : def.placeholder,
+      };
+    });
+    return map;
+  }, [t, i18n.language]);
 
   // 4) compute which fields to render
   const visibleFields = useMemo(() => {
     const base = FIELDS_BY_CATEGORY[category] ?? [];
-    // ensure Negotiable shows for all categories (deduped)
-    return Array.from(new Set([...base, "negotiable"]));
+    return [...base, "negotiable"]; // always include
   }, [category]);
 
-  const onChange = (key, value, def = FIELD_DEFS[key]) => {
+  const onChange = (key, value, def = fieldDefs[key]) => {
     let v = value;
     if (def?.type === "number" && v !== "" && v !== null) v = Number(v);
     if (def?.type === "checkbox") v = Boolean(value);
@@ -348,18 +481,23 @@ export default function CreateListingForm() {
     const current = images.length;
     const selected = file?.length || 0;
     if (selected === 0) {
-      setImageUploadError("Please select at least one image to upload");
+      setImageUploadError(t("createListing.messages.uploadSelectOne"));
       return;
     }
-    if (selected > 6) {
-      setImageUploadError("You can only select up to 6 images at once");
+    if (selected > MAX_IMAGES) {
+      setImageUploadError(
+        t("createListing.messages.uploadMaxPerBatch", { max: MAX_IMAGES })
+      );
       clearFileInput();
       return;
     }
-    if (current + selected > 6) {
-      const remaining = 6 - current;
+    if (current + selected > MAX_IMAGES) {
+      const remaining = MAX_IMAGES - current;
       setImageUploadError(
-        `You can only upload ${remaining} more image(s). You already have ${current} image(s)`
+        t("createListing.messages.uploadRemaining", {
+          remaining,
+          current,
+        })
       );
       clearFileInput();
       return;
@@ -374,7 +512,7 @@ export default function CreateListingForm() {
       setImages((prev) => prev.concat(uploaded));
       setImageUploadError("");
     } catch (err) {
-      setImageUploadError("Image upload failed (2 MB max per image)");
+      setImageUploadError(t("createListing.messages.uploadFailed"));
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -386,6 +524,10 @@ export default function CreateListingForm() {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  function normalizePhone(raw) {
+    return raw.replace(/[\s\-().]/g, "");
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError("");
@@ -394,20 +536,22 @@ export default function CreateListingForm() {
     // Minimal client validation for non-location fields
     for (const key of visibleFields) {
       if (key === "address") continue; // address validated via governorate/city below
-      const def = FIELD_DEFS[key];
+      const def = fieldDefs[key];
       if (def?.required && (form[key] === undefined || form[key] === "")) {
-        setSubmitError(`${def.label} is required`);
+        setSubmitError(
+          t("createListing.messages.fieldRequired", { field: def.label })
+        );
         return;
       }
     }
 
     // Validate location (governorate & city)
     if (!selectedGov) {
-      setSubmitError("Governorate is required");
+      setSubmitError(t("createListing.messages.govRequired"));
       return;
     }
     if (!selectedCity) {
-      setSubmitError("City/Area is required");
+      setSubmitError(t("createListing.messages.cityRequired"));
       return;
     }
 
@@ -415,23 +559,33 @@ export default function CreateListingForm() {
     const finalImages =
       images && images.length > 0 ? images : [DEFAULT_IMAGE_URL];
 
-    // Compose a human-friendly address string for display/compat
-    const addressDisplay = `${selectedGov.name} - ${selectedCity.name}${
-      selectedCity.slug === "other" && otherCityText
-        ? ` (${otherCityText})`
-        : ""
-    }`;
+    const toLocationEntry = (item) =>
+      item
+        ? {
+            slug: item.slug,
+          }
+        : undefined;
+
+    const locationPayload = {
+      governorate: toLocationEntry(selectedGov),
+      city: toLocationEntry(selectedCity),
+    };
+
+    const areaEntry = toLocationEntry(selectedArea);
+    if (areaEntry) locationPayload.area = areaEntry;
+    if (selectedCity?.slug === "other" && otherCityText.trim()) {
+      locationPayload.city_other_text = otherCityText.trim();
+    }
 
     const payload = {
       purpose,
       category,
       ...form,
-      address: addressDisplay, // keep for backward compatibility
       images: finalImages,
-      location: {
-        governorate: { slug: selectedGov.slug, name: selectedGov.name },
-        city: { slug: selectedCity.slug, name: selectedCity.name },
-        city_other_text: selectedCity.slug === "other" ? otherCityText : "",
+      location: locationPayload,
+      contact: {
+        phone: normalizePhone(form.contactPhone),
+        whatsapp: form.whatsapp !== false,
       },
     };
 
@@ -447,13 +601,17 @@ export default function CreateListingForm() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data?.message || "Failed to create listing");
+        throw new Error(
+          data?.message || t("createListing.messages.errorCreate")
+        );
       }
-      setSubmitSuccess("Listing created successfully");
+      setSubmitSuccess(t("createListing.messages.success"));
       // Optional: reset minimal fields but keep selectors
       setForm({});
       setSelectedGov(null);
       setSelectedCity(null);
+      setAreas([]);
+      setSelectedArea(null);
       setOtherCityText("");
       setImages([]);
       setImageUploadError("");
@@ -466,7 +624,7 @@ export default function CreateListingForm() {
         navigate(`/listing/${createdId}`);
       }
     } catch (err) {
-      setSubmitError(err.message || "Something went wrong");
+      setSubmitError(err.message || t("createListing.messages.errorGeneric"));
     } finally {
       setSubmitting(false);
     }
@@ -476,35 +634,42 @@ export default function CreateListingForm() {
     <form
       onSubmit={handleSubmit}
       className="max-w-xl mx-auto p-4 space-y-4 shadow-lg rounded-md mt-16"
+      dir={isAr ? "rtl" : "ltr"}
     >
-      <h1 className="text-2xl font-bold text-center mb-8">Create Listing</h1>
+      <h1 className="text-2xl font-bold text-center mb-8">
+        {t("createListing.title")}
+      </h1>
       {/* Top selectors */}
       <div className="grid grid-cols-2 gap-3 ">
         <label className="flex items-center gap-2 border p-3 rounded-lg">
-          <span className="text-sm text-slate-600">Purpose:</span>
+          <span className="text-sm text-slate-600">
+            {t("createListing.form.purposeLabel")}
+          </span>
           <select
             className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           >
-            {PURPOSES.map((p) => (
-              <option key={p} value={p}>
-                {p[0].toUpperCase() + p.slice(1)}
+            {PURPOSE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
         </label>
 
         <label className="flex items-center gap-2 border p-3 rounded-lg">
-          <span className="text-sm text-slate-600">Type:</span>
+          <span className="text-sm text-slate-600">
+            {t("createListing.form.categoryLabel")}
+          </span>
           <select
             className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
-            {CATEGORIES.map((c) => (
+            {CATEGORY_OPTIONS.map((c) => (
               <option key={c} value={c}>
-                {toTitle(c)}
+                {t(`listing.propertyTypes.${c}`)}
               </option>
             ))}
           </select>
@@ -514,18 +679,20 @@ export default function CreateListingForm() {
       {/* Dynamic fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {visibleFields.map((key) => {
-          const def = FIELD_DEFS[key];
+          const def = fieldDefs[key];
           const v = def.type === "checkbox" ? !!form[key] : form[key] ?? "";
           // Custom renderer for address/location
           if (key === "address") {
             return (
               <div
                 key={key}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:col-span-2 "
+                className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:col-span-2 w-full"
               >
                 {/* Governorate */}
                 <label className="flex flex-col gap-1">
-                  <span className="text-sm">Governorate</span>
+                  <span className="text-sm">
+                    {t("createListing.form.governorateLabel")}
+                  </span>
                   <select
                     className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
                     value={selectedGov?.slug || ""}
@@ -533,14 +700,16 @@ export default function CreateListingForm() {
                       const slug = e.target.value;
                       const g = govs.find((x) => x.slug === slug) || null;
                       setSelectedGov(g);
+                      setSelectedCity(null);
+                      setOtherCityText("");
                     }}
                   >
                     <option value="" disabled>
-                      Select Governorate
+                      {t("createListing.form.selectGovernorate")}
                     </option>
                     {govs.map((g) => (
                       <option key={g.slug} value={g.slug}>
-                        {g.name}
+                        {getDisplayName(g)}
                       </option>
                     ))}
                   </select>
@@ -548,7 +717,9 @@ export default function CreateListingForm() {
 
                 {/* City */}
                 <label className="flex flex-col gap-1">
-                  <span className="text-sm">City / Area</span>
+                  <span className="text-sm">
+                    {t("createListing.form.cityLabel")}
+                  </span>
                   <select
                     className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
                     value={selectedCity?.slug || ""}
@@ -557,28 +728,72 @@ export default function CreateListingForm() {
                       const c =
                         cities.find((x) => String(x.slug) === slug) || null;
                       setSelectedCity(c);
+                      setSelectedArea(null);
+                      if (slug !== "other") {
+                        setOtherCityText("");
+                      }
                     }}
                     disabled={!selectedGov}
                   >
                     <option value="" disabled>
-                      {selectedGov ? "Select City" : "Select Governorate first"}
+                      {selectedGov
+                        ? t("createListing.form.selectCity")
+                        : t("createListing.form.selectGovernorateFirst")}
                     </option>
                     {cities.map((c) => (
                       <option key={c.slug} value={c.slug}>
-                        {c.name}
+                        {getDisplayName(c)}
                       </option>
                     ))}
                   </select>
                 </label>
 
+                {/* Area */}
+                {selectedCity && Array.isArray(areas) && areas.length > 0 && (
+                  <label className="flex flex-col gap-1">
+                    <span className="text-sm">
+                      {t("createListing.form.areaLabel", {
+                        defaultValue: "Area",
+                      })}
+                    </span>
+                    <select
+                      className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
+                      value={selectedArea?.slug || ""}
+                      onChange={(e) => {
+                        const slug = e.target.value;
+                        const a =
+                          areas.find((x) => String(x.slug) === String(slug)) ||
+                          null;
+                        setSelectedArea(a);
+                      }}
+                      disabled={
+                        !selectedGov || !selectedCity || areas.length === 0
+                      }
+                    >
+                      <option value="">
+                        {t("createListing.form.selectArea", {
+                          defaultValue: "All areas",
+                        })}
+                      </option>
+                      {areas.map((a) => (
+                        <option key={a.slug} value={String(a.slug)}>
+                          {getDisplayName(a)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+
                 {/* Other City Free-text when city === other */}
                 {selectedCity?.slug === "other" && (
                   <label className="flex flex-col gap-1 sm:col-span-2">
-                    <span className="text-sm">Specify Area (optional)</span>
+                    <span className="text-sm">
+                      {t("createListing.form.otherAreaLabel")}
+                    </span>
                     <input
                       className="border rounded-md px-3 py-2"
                       type="text"
-                      placeholder="e.g., Near Ring Road, Abu Rawash"
+                      placeholder={t("createListing.form.otherAreaPlaceholder")}
                       value={otherCityText}
                       onChange={(e) => setOtherCityText(e.target.value)}
                     />
@@ -597,11 +812,11 @@ export default function CreateListingForm() {
                   onChange={(e) => onChange(key, e.target.value, def)}
                 >
                   <option value="" disabled>
-                    Select {def.label}
+                    {t("createListing.form.selectOption", { field: def.label })}
                   </option>
-                  {def.options.map((o) => (
+                  {def.options?.map((o) => (
                     <option key={o} value={o}>
-                      {toTitle(o)}
+                      {getOptionLabel(key, o)}
                     </option>
                   ))}
                 </select>
@@ -657,6 +872,30 @@ export default function CreateListingForm() {
         })}
       </div>
 
+      {/* Contact Phone & WhatsApp */}
+      <span className="text-sm">{t("createListing.form.phoneLabel")}</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label className="flex flex-col gap-1">
+          <input
+            type="tel"
+            id="contactPhone"
+            placeholder="+2010xxxxxxxx"
+            className="border rounded-md px-3 py-2"
+            value={form.contactPhone || ""}
+            onChange={(e) => setForm({ ...form, contactPhone: e.target.value })}
+            required
+          />
+        </label>
+        <label className="inline-flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={form.whatsapp !== false}
+            onChange={(e) => setForm({ ...form, whatsapp: e.target.checked })}
+          />
+          <span>{t("createListing.form.allowWhatsapp")}</span>
+        </label>
+      </div>
+
       {/* Images uploader (Firebase) */}
       <div className="flex flex-col gap-3 sm:col-span-2">
         <div className="flex gap-2">
@@ -675,7 +914,9 @@ export default function CreateListingForm() {
             onClick={handleImageSubmit}
             className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-500 transition cursor-pointer disabled:opacity-80"
           >
-            {uploading ? "Uploading..." : "Upload"}
+            {uploading
+              ? t("createListing.actions.uploading")
+              : t("createListing.actions.upload")}
           </button>
         </div>
 
@@ -686,7 +927,9 @@ export default function CreateListingForm() {
               style={{ width: `${uploadProgress}%` }}
             ></div>
             <p className="text-sm text-center mt-1">
-              {uploadProgress}% uploaded
+              {t("createListing.messages.uploadProgress", {
+                progress: uploadProgress,
+              })}
             </p>
           </div>
         )}
@@ -711,13 +954,13 @@ export default function CreateListingForm() {
                 onClick={() => handleRemoveImage(index)}
                 className="p-2 text-red-700 rounded-lg uppercase hover:opacity-75"
               >
-                Delete
+                {t("common.delete", "Delete")}
               </button>
             </div>
           ))}
         {images.length === 0 && (
           <p className="text-xs text-slate-500">
-            No images selected — a default image will be used.
+            {t("createListing.messages.noImages")}
           </p>
         )}
       </div>
@@ -740,7 +983,9 @@ export default function CreateListingForm() {
           submitting ? "bg-indigo-400" : "bg-indigo-600 hover:opacity-95"
         }`}
       >
-        {submitting ? "Creating…" : "Create Listing"}
+        {submitting
+          ? t("createListing.actions.creating")
+          : t("createListing.actions.submit")}
       </button>
     </form>
   );

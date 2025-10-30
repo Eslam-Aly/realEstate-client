@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+
 import ListingItems from "../components/ListingItems.jsx";
+import { useTranslation } from "react-i18next";
 
 function Search() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
 
@@ -12,6 +15,8 @@ function Search() {
     searchTerm: "",
     governorate: "", // slug
     city: "", // slug
+    area: "",
+    area: "", // slug
     purpose: "all", // UI field: all | rent | sale
     type: "all", // UI field: all | apartment | villa | commercial | land | building
     parking: false,
@@ -27,12 +32,18 @@ function Search() {
     sort: "createdAt",
     order: "desc",
   });
-  const [govs, setGovs] = useState([]); // [{name, slug}]
-  const [cities, setCities] = useState([]); // [{name, slug}]
+  const [govs, setGovs] = useState([]); // [{name, slug, nameAr}]
+  const [cities, setCities] = useState([]); // [{name, slug, nameAr}]
+  const [areas, setAreas] = useState([]); // [{name, slug, nameAr}]
+  const isAr = i18n?.language?.startsWith("ar");
+  const langParam = isAr ? "ar" : "en";
+  const getDisplayName = (item) =>
+    isAr && item?.nameAr ? item.nameAr : item?.name || "";
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get("searchTerm") || "";
     const governorateFromUrl = urlParams.get("gov") || "";
+    const areaFromUrl = urlParams.get("area") || "";
     const cityFromUrl = urlParams.get("city") || "";
     const purposeFromUrl = urlParams.get("purpose") || "all";
     const baseTypeFromUrl = urlParams.get("category") || "all";
@@ -58,6 +69,8 @@ function Search() {
       searchTerm: searchTermFromUrl,
       governorate: governorateFromUrl,
       city: cityFromUrl,
+      area: areaFromUrl,
+      area: areaFromUrl,
       purpose: purposeFromUrl,
       type: baseTypeFromUrl,
       parking: parkingFromUrl,
@@ -109,10 +122,10 @@ function Search() {
     fetchListings();
   }, [location.search]);
 
-  // Fetch governorates on mount
+  // Fetch governorates on mount and when language changes
   useEffect(() => {
     let active = true;
-    fetch("/api/locations/governorates")
+    fetch(`/api/locations/governorates?lang=${langParam}`)
       .then((r) => r.json())
       .then((data) => {
         if (!active) return;
@@ -122,28 +135,77 @@ function Search() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [langParam]);
 
   // Fetch cities when governorate changes
   useEffect(() => {
     let active = true;
     if (!sidebarData.governorate) {
       setCities([]);
+      setAreas([]);
+      setSidebarData((prev) =>
+        prev.city || prev.area ? { ...prev, city: "", area: "" } : prev
+      );
       return;
     }
-    fetch(`/api/locations/cities/${sidebarData.governorate}`)
+    fetch(
+      `/api/locations/governorates/${sidebarData.governorate}/cities?lang=${langParam}`
+    )
       .then((r) => r.json())
       .then((data) => {
         if (!active) return;
-        setCities(Array.isArray(data) ? data : []);
+        const list = Array.isArray(data?.cities) ? data.cities : [];
+        setCities(list);
+        setSidebarData((prev) => {
+          if (!list.some((c) => c.slug === prev.city)) {
+            return { ...prev, city: "", area: "" };
+          }
+          return prev;
+        });
       })
-      .catch(() => setCities([]));
-    // reset city if it doesn't belong to the new list
-    setSidebarData((prev) => ({ ...prev, city: "" }));
+      .catch(() => {
+        setCities([]);
+        setAreas([]);
+        setSidebarData((prev) =>
+          prev.city || prev.area ? { ...prev, city: "", area: "" } : prev
+        );
+      });
     return () => {
       active = false;
     };
-  }, [sidebarData.governorate]);
+  }, [sidebarData.governorate, langParam]);
+
+  // Fetch areas when city changes
+  useEffect(() => {
+    let active = true;
+    if (!sidebarData.governorate || !sidebarData.city) {
+      setAreas([]);
+      setSidebarData((prev) => (prev.area ? { ...prev, area: "" } : prev));
+      return;
+    }
+    fetch(
+      `/api/locations/governorates/${sidebarData.governorate}/cities/${sidebarData.city}/areas?lang=${langParam}`
+    )
+      .then((r) => r.json())
+      .then((data) => {
+        if (!active) return;
+        const list = Array.isArray(data?.areas) ? data.areas : [];
+        setAreas(list);
+        setSidebarData((prev) => {
+          if (!list.some((a) => a.slug === prev.area)) {
+            return { ...prev, area: "" };
+          }
+          return prev;
+        });
+      })
+      .catch(() => {
+        setAreas([]);
+        setSidebarData((prev) => (prev.area ? { ...prev, area: "" } : prev));
+      });
+    return () => {
+      active = false;
+    };
+  }, [sidebarData.governorate, sidebarData.city, langParam]);
 
   const handleChange = (e) => {
     const { name, id, type, value, checked } = e.target;
@@ -155,6 +217,25 @@ function Search() {
         ...prev,
         sort: sortField,
         order: sortOrder || "desc",
+      }));
+      return;
+    }
+
+    if (key === "governorate") {
+      setSidebarData((prev) => ({
+        ...prev,
+        governorate: value,
+        city: "",
+        area: "",
+      }));
+      return;
+    }
+
+    if (key === "city") {
+      setSidebarData((prev) => ({
+        ...prev,
+        city: value,
+        area: "",
       }));
       return;
     }
@@ -179,6 +260,7 @@ function Search() {
     // location
     if (sidebarData.governorate) urlParams.set("gov", sidebarData.governorate);
     if (sidebarData.city) urlParams.set("city", sidebarData.city);
+    if (sidebarData.area) urlParams.set("area", sidebarData.area);
 
     // purpose & category
     if (sidebarData.purpose !== "all")
@@ -224,6 +306,7 @@ function Search() {
       searchTerm: "",
       governorate: "",
       city: "",
+      area: "",
       purpose: "all",
       type: "all",
       parking: false,
@@ -256,14 +339,14 @@ function Search() {
               htmlFor="searchTerm"
               className="text-sm font-medium text-slate-700"
             >
-              Search
+              {t("search.search")}
             </label>
             <input
               type="text"
               id="searchTerm"
               name="searchTerm"
               value={sidebarData.searchTerm}
-              placeholder="Search..."
+              placeholder={t("nav.search")}
               onChange={handleChange}
               className="border border-gray-300 rounded-md p-2"
             />
@@ -273,7 +356,7 @@ function Search() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="flex items-center gap-2 border-slate-600 bg-white border p-3 rounded-lg">
               <span className="whitespace-nowrap text-sm text-slate-600">
-                Purpose:
+                {t("search.purpose")}:
               </span>
               <select
                 name="purpose"
@@ -282,15 +365,15 @@ function Search() {
                 value={sidebarData.purpose}
                 onChange={handleChange}
               >
-                <option value="all">All</option>
-                <option value="rent">Rent</option>
-                <option value="sale">Sale</option>
+                <option value="all">{t("search.all")}</option>
+                <option value="rent">{t("search.rent")}</option>
+                <option value="sale">{t("search.sale")}</option>
               </select>
             </label>
 
             <label className="flex items-center gap-2 border-slate-600 bg-white border p-3 rounded-lg">
               <span className="whitespace-nowrap text-sm text-slate-600">
-                Type:
+                {t("search.type")}:
               </span>
               <select
                 name="type"
@@ -299,42 +382,59 @@ function Search() {
                 value={sidebarData.type}
                 onChange={handleChange}
               >
-                <option value="all">All</option>
-                <option value="apartment">Apartments</option>
-                <option value="villa">Villas</option>
-                <option value="duplex">Duplex</option>
-                <option value="studio">Studios</option>
-                <option value="land">Lands</option>
-                <option value="shop">Shops</option>
-                <option value="office">Offices</option>
-                <option value="warehouse">Warehouses</option>
-                <option value="building">Buildings</option>
-                <option value="other">Other</option>
+                <option value="all">{t("search.all")}</option>
+                <option value="apartment">
+                  {t("listing.propertyTypes.apartment")}
+                </option>
+                <option value="villa">
+                  {t("listing.propertyTypes.villa")}
+                </option>
+                <option value="duplex">
+                  {t("listing.propertyTypes.duplex")}
+                </option>
+                <option value="studio">
+                  {t("listing.propertyTypes.studio")}
+                </option>
+                <option value="land">{t("listing.propertyTypes.land")}</option>
+                <option value="shop">{t("listing.propertyTypes.shop")}</option>
+                <option value="office">
+                  {t("listing.propertyTypes.office")}
+                </option>
+                <option value="warehouse">
+                  {t("listing.propertyTypes.warehouse")}
+                </option>
+                <option value="building">
+                  {t("listing.propertyTypes.building")}
+                </option>
+                <option value="other">
+                  {t("listing.propertyTypes.other")}
+                </option>
               </select>
             </label>
           </div>
 
-          {/* Row 3: Governorate + City */}
+          {/* Row 3: Governorate + City + Area */}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="flex flex-col gap-1">
-              <span className="text-sm">Governorate</span>
+              <span className="text-sm">{t("search.governorate")}</span>
               <select
                 name="governorate"
                 className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
                 value={sidebarData.governorate}
                 onChange={handleChange}
               >
-                <option value="">All Governorates</option>
+                <option value="">{t("search.allGov")}</option>
                 {govs.map((g) => (
                   <option key={g.slug} value={g.slug}>
-                    {g.name}
+                    {getDisplayName(g)}
                   </option>
                 ))}
               </select>
             </label>
 
             <label className="flex flex-col gap-1">
-              <span className="text-sm">City / Area</span>
+              <span className="text-sm">{t("search.city")}</span>
               <select
                 name="city"
                 className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
@@ -344,16 +444,40 @@ function Search() {
               >
                 <option value="">
                   {sidebarData.governorate
-                    ? "All Cities"
-                    : "Select Governorate first"}
+                    ? `${t("search.allCities")}`
+                    : `${t("search.selectGovFirst")}`}
                 </option>
                 {cities.map((c) => (
                   <option key={c.slug} value={String(c.slug)}>
-                    {c.name}
+                    {getDisplayName(c)}
                   </option>
                 ))}
               </select>
             </label>
+
+            {sidebarData.city && Array.isArray(areas) && areas.length > 0 && (
+              <label className="flex flex-col gap-1">
+                <span className="text-sm">{t("search.area")}</span>
+                <select
+                  name="area"
+                  className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
+                  value={sidebarData.area}
+                  onChange={handleChange}
+                  disabled={
+                    !sidebarData.governorate ||
+                    !sidebarData.city ||
+                    areas.length === 0
+                  }
+                >
+                  <option value="">{t("search.allAreas")}</option>
+                  {areas.map((a) => (
+                    <option key={a.slug} value={String(a.slug)}>
+                      {getDisplayName(a)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
           </div>
 
           {/* Row 4: Price & Size */}
@@ -363,7 +487,7 @@ function Search() {
               className="border p-3 rounded-lg"
               type="number"
               name="minPrice"
-              placeholder="Min Price"
+              placeholder={t("search.minPrice")}
               onChange={handleChange}
             />
             <input
@@ -371,7 +495,7 @@ function Search() {
               className="border p-3 rounded-lg"
               type="number"
               name="maxPrice"
-              placeholder="Max Price"
+              placeholder={t("search.maxPrice")}
               onChange={handleChange}
             />
             <input
@@ -379,7 +503,7 @@ function Search() {
               className="border p-3 rounded-lg"
               type="number"
               name="minSize"
-              placeholder="Min Size (sqm)"
+              placeholder={t("search.minSize")}
               onChange={handleChange}
             />
             <input
@@ -387,7 +511,7 @@ function Search() {
               className="border p-3 rounded-lg"
               type="number"
               name="maxSize"
-              placeholder="Max Size (sqm)"
+              placeholder={t("search.maxSize")}
               onChange={handleChange}
             />
           </div>
@@ -399,7 +523,7 @@ function Search() {
               className="border p-3 rounded-lg"
               type="number"
               name="minBedrooms"
-              placeholder="Min Bedrooms"
+              placeholder={t("search.minBeds")}
               onChange={handleChange}
             />
             <input
@@ -407,7 +531,7 @@ function Search() {
               className="border p-3 rounded-lg"
               type="number"
               name="maxBedrooms"
-              placeholder="Max Bedrooms"
+              placeholder={t("search.maxBeds")}
               onChange={handleChange}
             />
             <input
@@ -415,7 +539,7 @@ function Search() {
               className="border p-3 rounded-lg"
               type="number"
               name="minBathrooms"
-              placeholder="Min Bathrooms"
+              placeholder={t("search.minBaths")}
               onChange={handleChange}
             />
             <input
@@ -423,7 +547,7 @@ function Search() {
               className="border p-3 rounded-lg"
               type="number"
               name="maxBathrooms"
-              placeholder="Max Bathrooms"
+              placeholder={t("search.maxBaths")}
               onChange={handleChange}
             />
           </div>
@@ -431,17 +555,19 @@ function Search() {
           {/* Row 6: Sort & toggles */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <label className="flex gap-2 border rounded-md px-3 py-2">
-              <span className="text-sm text-slate-600">Sort:</span>
+              <span className="text-sm text-slate-600">
+                {t("search.sort")}:
+              </span>
               <select
                 name="sortBy"
                 className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer"
                 value={`${sidebarData.sort}_${sidebarData.order}`}
                 onChange={handleChange}
               >
-                <option value="createdAt_desc">Newest</option>
-                <option value="createdAt_asc">Oldest</option>
-                <option value="price_asc">Price (Low → High)</option>
-                <option value="price_desc">Price (High → Low)</option>
+                <option value="createdAt_desc">{t("search.newest")}</option>
+                <option value="createdAt_asc">{t("search.oldest")}</option>
+                <option value="price_asc">{t("search.priceLH")}</option>
+                <option value="price_desc">{t("search.priceHL")}</option>
               </select>
             </label>
 
@@ -452,7 +578,7 @@ function Search() {
                 checked={sidebarData.parking}
                 onChange={handleChange}
               />
-              <span className="text-sm">Parking</span>
+              <span className="text-sm">{t("listing.parking")}</span>
             </label>
 
             <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
@@ -462,7 +588,7 @@ function Search() {
                 checked={sidebarData.furnished}
                 onChange={handleChange}
               />
-              <span className="text-sm">Furnished</span>
+              <span className="text-sm">{t("listing.furnished")}</span>
             </label>
           </div>
 
@@ -472,14 +598,14 @@ function Search() {
               type="submit"
               className="bg-blue-700 text-white rounded-md p-2 hover:bg-blue-800 transition cursor-pointer"
             >
-              Search
+              {t("search.search")}
             </button>
             <button
               type="button"
               onClick={resetFilters}
               className="bg-gray-200 text-gray-800 rounded-md p-2 hover:bg-gray-300 transition cursor-pointer"
             >
-              Reset
+              {t("search.reset")}
             </button>
           </div>
         </form>
@@ -488,12 +614,14 @@ function Search() {
       {/* Results */}
       <section>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Search Results</h2>
+          <h2 className="text-2xl font-bold">{t("search.searchResults")}</h2>
           <span className="text-slate-500 text-sm">
             {loading
               ? "Loading…"
-              : `Showing ${listings.length} ${
-                  listings.length === 1 ? "listing" : "listings"
+              : `${t("search.showing")} ${listings.length} ${
+                  listings.length === 1
+                    ? t("search.listing")
+                    : t("search.listings")
                 }`}
           </span>
         </div>
@@ -508,7 +636,7 @@ function Search() {
             ))}
           </div>
         ) : listings.length === 0 ? (
-          <div className="text-slate-600">No listings found.</div>
+          <div className="text-slate-600">{t("search.noResults")}</div>
         ) : (
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {listings.map((listing) => (

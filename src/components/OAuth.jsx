@@ -35,7 +35,7 @@ function OAuth() {
     <button
       type="button"
       onClick={handleGoogleClick}
-      className="border p-3 rounded-lg w-full flex justify-center items-center gap-3 hover:shadow-md transition-shadow duration-150 ease-in-out"
+      className="border p-3 rounded-lg w-full flex justify-center items-center gap-3 hover:shadow-md transition-shadow duration-150 ease-in-out cursor-pointer"
     >
       Continue Google
     </button>

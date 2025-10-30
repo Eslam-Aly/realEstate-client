@@ -6,8 +6,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import LangSwitch from "./LangSwitch.jsx";
+import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 function Header() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.dir() === "rtl";
+
   const Navigate = useNavigate();
 
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -35,17 +40,18 @@ function Header() {
       <div className="container mx-auto flex items-center justify-between w-[90%] ">
         <div>
           <Link to="/" className="text-sm md:text-2xl font-bold cursor-pointer">
-            Logo
+            {t("nav.logoText")}
           </Link>
         </div>
         <div className="flex items-center justify-center ">
           <form
+            dir={isRTL ? "rtl" : "ltr"}
             onSubmit={handleSubmit}
             className="flex w-[60%] sm:w-[80%]  items-center rounded-full border border-gray-300 bg-white/90 px-4 py-1 shadow-md backdrop-blur"
           >
             <input
               type="text"
-              placeholder="Search..."
+              placeholder={t("nav.search")}
               className="w-full bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -58,24 +64,22 @@ function Header() {
             </button>
           </form>
         </div>
-        <nav className="flex items-center gap-4">
+        <nav className="flex items-center gap-2 md:gap-6 text-sm md:text-base">
           <Link to="/" className="hidden md:inline-block">
-            Home
+            {t("nav.home")}
           </Link>
-          <Link to="/about" className="hidden md:inline-block">
-            About
-          </Link>
+
           <LangSwitch />
           {currentUser ? (
             <Link to="/profile">
               <img
                 src={currentUser.avatar}
                 alt="avatar"
-                className="rounded-full w-10 h-10 inline-block"
+                className="rounded-full w-9 h-9 inline-block"
               />
             </Link>
           ) : (
-            <Link to="/signin">Sign In</Link>
+            <Link to="/signin">{t("nav.signIn")}</Link>
           )}
         </nav>
       </div>

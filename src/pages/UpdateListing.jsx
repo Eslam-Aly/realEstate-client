@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 import { app } from "../firebase.js";
 import {
@@ -10,6 +11,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
+import { set } from "mongoose";
 
 const DEFAULT_IMAGE_URL =
   import.meta?.env?.VITE_DEFAULT_LISTING_IMAGE || "/placeholder.jpg";
@@ -17,9 +19,13 @@ const API_BASE = import.meta?.env?.VITE_API_BASE || "/api";
 const getToken = () =>
   localStorage.getItem("token") || localStorage.getItem("access_token") || "";
 
-/** 1) Main selectors */
-const PURPOSES = ["rent", "sale"];
-const CATEGORIES = [
+/** 1) Option metadata */
+const PURPOSE_OPTIONS = [
+  { value: "rent", labelKey: "createListing.purpose.rent" },
+  { value: "sale", labelKey: "createListing.purpose.sale" },
+];
+
+const CATEGORY_OPTIONS = [
   "apartment",
   "villa",
   "duplex",
@@ -32,76 +38,128 @@ const CATEGORIES = [
   "other",
 ];
 
-/** 2) Field registry */
-const FIELD_DEFS = {
-  title: { label: "Title", type: "text", required: true },
-  address: { label: "Address", type: "location" },
-  description: { label: "Description", type: "textarea", required: true },
-  price: { label: "Price", type: "number", min: 0, required: true },
-  size: { label: "Size (sqm)", type: "number", min: 0 },
+const ZONING_OPTIONS = [
+  "residential",
+  "commercial",
+  "agricultural",
+  "industrial",
+];
 
-  bedrooms: {
-    label: "Bedrooms",
-    type: "select",
-    options: Array.from({ length: 21 }, (_, i) => i),
-  },
-  bathrooms: {
-    label: "Bathrooms",
-    type: "select",
-    options: Array.from({ length: 11 }, (_, i) => i),
-  },
-  floor: {
-    label: "Floor",
-    type: "select",
-    options: Array.from({ length: 51 }, (_, i) => i),
-  },
-  furnished: { label: "Furnished", type: "checkbox" },
-  parking: { label: "Parking", type: "checkbox" },
-  negotiable: { label: "Negotiable", type: "checkbox" },
+const LICENSE_OPTIONS = [
+  "retail",
+  "office",
+  "restaurant",
+  "warehouse",
+  "clinic",
+  "other",
+];
 
-  plotArea: {
-    label: "Plot Area (sqm)",
+/** 2) Field registry (translation keys) */
+const FIELD_CONFIG = {
+  title: {
+    labelKey: "createListing.fields.title",
+    type: "text",
+    required: true,
+  },
+  address: { labelKey: "createListing.fields.address", type: "location" },
+  description: {
+    labelKey: "createListing.fields.description",
+    type: "textarea",
+    required: true,
+    placeholderKey: "createListing.fields.descriptionPlaceholder",
+  },
+  price: {
+    labelKey: "createListing.fields.price",
     type: "number",
     min: 0,
     required: true,
   },
-  frontage: { label: "Frontage (m)", type: "number", min: 0 },
-  zoning: {
-    label: "Zoning",
+  size: { labelKey: "createListing.fields.size", type: "number", min: 0 },
+
+  bedrooms: {
+    labelKey: "createListing.fields.bedrooms",
     type: "select",
-    options: ["residential", "commercial", "agricultural", "industrial"],
+    options: Array.from({ length: 21 }, (_, i) => i),
   },
-  cornerLot: { label: "Corner Lot", type: "checkbox" },
+  bathrooms: {
+    labelKey: "createListing.fields.bathrooms",
+    type: "select",
+    options: Array.from({ length: 11 }, (_, i) => i),
+  },
+  floor: {
+    labelKey: "createListing.fields.floor",
+    type: "select",
+    options: Array.from({ length: 51 }, (_, i) => i),
+  },
+  furnished: { labelKey: "createListing.fields.furnished", type: "checkbox" },
+  parking: { labelKey: "createListing.fields.parking", type: "checkbox" },
+  negotiable: { labelKey: "createListing.fields.negotiable", type: "checkbox" },
+
+  plotArea: {
+    labelKey: "createListing.fields.plotArea",
+    type: "number",
+    min: 0,
+    required: true,
+  },
+  frontage: {
+    labelKey: "createListing.fields.frontage",
+    type: "number",
+    min: 0,
+  },
+  zoning: {
+    labelKey: "createListing.fields.zoning",
+    type: "select",
+    options: ZONING_OPTIONS,
+  },
+  cornerLot: { labelKey: "createListing.fields.cornerLot", type: "checkbox" },
 
   floorArea: {
-    label: "Floor Area (sqm)",
+    labelKey: "createListing.fields.floorArea",
     type: "number",
     min: 0,
     required: true,
   },
   licenseType: {
-    label: "License Type",
+    labelKey: "createListing.fields.licenseType",
     type: "select",
-    options: ["retail", "office", "restaurant", "warehouse", "clinic", "other"],
+    options: LICENSE_OPTIONS,
   },
-  hasMezz: { label: "Mezzanine", type: "checkbox" },
-  parkingSpots: { label: "Parking Spots", type: "number", min: 0, step: 1 },
+  hasMezz: { labelKey: "createListing.fields.hasMezz", type: "checkbox" },
+  parkingSpots: {
+    labelKey: "createListing.fields.parkingSpots",
+    type: "number",
+    min: 0,
+    step: 1,
+  },
 
   totalFloors: {
-    label: "Total Floors",
+    labelKey: "createListing.fields.totalFloors",
     type: "number",
     min: 1,
     step: 1,
     required: true,
   },
-  totalUnits: { label: "Total Units", type: "number", min: 1, step: 1 },
-  elevator: { label: "Elevator", type: "checkbox" },
-  landArea: { label: "Land Area (sqm)", type: "number", min: 0 },
+  totalUnits: {
+    labelKey: "createListing.fields.totalUnits",
+    type: "number",
+    min: 1,
+    step: 1,
+  },
+  elevator: { labelKey: "createListing.fields.elevator", type: "checkbox" },
+  landArea: {
+    labelKey: "createListing.fields.landArea",
+    type: "number",
+    min: 0,
+  },
   buildYear: {
-    label: "Build Year",
+    labelKey: "createListing.fields.buildYear",
     type: "number",
     min: 1900,
     max: new Date().getFullYear(),
+  },
+  negotiable: {
+    labelKey: "createListing.fields.negotiable",
+    type: "checkbox",
   },
 };
 
@@ -211,13 +269,16 @@ export default function UpdateListing() {
   const navigate = useNavigate();
   const params = useParams();
   const { currentUser } = useSelector((s) => s.user);
+  const { t, i18n } = useTranslation();
+  const isAr = i18n?.language?.startsWith("ar");
+  const langParam = isAr ? "ar" : "en";
 
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
   // Top selectors
-  const [purpose, setPurpose] = useState("rent");
-  const [category, setCategory] = useState("apartment");
+  const [purpose, setPurpose] = useState(PURPOSE_OPTIONS[0].value);
+  const [category, setCategory] = useState(CATEGORY_OPTIONS[0]);
 
   // Dynamic fields
   const [form, setForm] = useState({});
@@ -225,10 +286,11 @@ export default function UpdateListing() {
   // Location (governorate/city)
   const [govs, setGovs] = useState([]);
   const [cities, setCities] = useState([]);
+  const [areas, setAreas] = useState([]);
   const [selectedGov, setSelectedGov] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
+  const [selectedArea, setSelectedArea] = useState(null);
   const [otherCityText, setOtherCityText] = useState("");
-
   // Images (Firebase)
   const [file, setFile] = useState([]);
   const [images, setImages] = useState([]);
@@ -236,13 +298,38 @@ export default function UpdateListing() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileRef = useRef(null);
+  const MAX_IMAGES = 6;
+
+  const getDisplayName = (item) =>
+    isAr && item?.nameAr ? item.nameAr : item?.name || "";
+
+  const getOptionLabel = (fieldKey, option) => {
+    if (typeof option === "number") return option;
+    return t(`createListing.options.${fieldKey}.${option}`, {
+      defaultValue: toTitle(option),
+    });
+  };
+
+  const fieldDefs = useMemo(() => {
+    const map = {};
+    Object.entries(FIELD_CONFIG).forEach(([key, def]) => {
+      map[key] = {
+        ...def,
+        label: t(def.labelKey),
+        placeholder: def.placeholderKey
+          ? t(def.placeholderKey)
+          : def.placeholder,
+      };
+    });
+    return map;
+  }, [t, i18n.language]);
 
   const visibleFields = useMemo(() => {
     const base = FIELDS_BY_CATEGORY[category] ?? [];
     return Array.from(new Set([...base, "negotiable"]));
   }, [category]);
 
-  const onChange = (key, value, def = FIELD_DEFS[key]) => {
+  const onChange = (key, value, def = fieldDefs[key]) => {
     let v = value;
     if (def?.type === "number" && v !== "" && v !== null) v = Number(v);
     if (def?.type === "checkbox") v = Boolean(value);
@@ -256,20 +343,30 @@ export default function UpdateListing() {
     setForm((p) => ({ ...p, [key]: v }));
   };
 
-  // Load governorates on mount
+  // Load governorates on mount & language change
   useEffect(() => {
     let active = true;
-    fetch(`/api/locations/governorates`)
+    fetch(`/api/locations/governorates?lang=${langParam}`)
       .then((r) => r.json())
       .then((data) => {
         if (!active) return;
-        setGovs(Array.isArray(data) ? data : []);
+        const list = Array.isArray(data) ? data : [];
+        setGovs(list);
+        setSelectedGov((prev) => {
+          if (!prev) return prev;
+          return list.find((g) => g.slug === prev.slug) || null;
+        });
       })
-      .catch(() => setGovs([]));
+      .catch(() => {
+        setGovs([]);
+        setSelectedGov(null);
+        setSelectedCity(null);
+        setOtherCityText("");
+      });
     return () => {
       active = false;
     };
-  }, []);
+  }, [langParam]);
 
   // Load listing data
   useEffect(() => {
@@ -281,11 +378,19 @@ export default function UpdateListing() {
         const res = await fetch(`${API_BASE}/listings/get/${id}`);
         const data = await res.json();
         if (!res.ok || data?.success === false)
-          throw new Error(data?.message || "Failed to load listing");
+          throw new Error(
+            data?.message || t("updateListing.messages.loadError")
+          );
 
         // Top selectors
-        setPurpose(data.purpose || "rent");
-        setCategory(data.category || "apartment");
+        const safePurpose =
+          PURPOSE_OPTIONS.find((opt) => opt.value === data.purpose)?.value ||
+          PURPOSE_OPTIONS[0].value;
+        setPurpose(safePurpose);
+        const safeCategory = CATEGORY_OPTIONS.includes(data.category)
+          ? data.category
+          : CATEGORY_OPTIONS[0];
+        setCategory(safeCategory);
 
         // Images
         setImages(
@@ -298,18 +403,54 @@ export default function UpdateListing() {
         const loc = data.location || {};
         const gov = loc.governorate || null;
         const city = loc.city || null;
-        setOtherCityText(loc.city_other_text || "");
+        const area = loc.area || null;
 
         if (gov?.slug) {
-          const resCities = await fetch(`/api/locations/cities/${gov.slug}`);
-          const list = await resCities.json();
-          setCities(Array.isArray(list) ? list : []);
-          setSelectedGov(gov);
+          const resCities = await fetch(
+            `/api/locations/governorates/${gov.slug}/cities?lang=${langParam}`
+          );
+          const cityPayload = await resCities.json();
+          const list = Array.isArray(cityPayload?.cities)
+            ? cityPayload.cities
+            : [];
+          setCities(list);
+          setSelectedGov({
+            slug: gov.slug,
+            name: gov.name,
+            nameAr: gov.nameAr,
+          });
           if (city?.slug) {
-            const match = (Array.isArray(list) ? list : []).find(
+            const match = list.find(
               (c) => String(c.slug) === String(city.slug)
             );
-            setSelectedCity(match || city);
+            setSelectedCity(
+              match || {
+                slug: city.slug,
+                name: city.name,
+                nameAr: city.nameAr,
+              }
+            );
+            // Load areas for city
+
+            if (gov?.slug && city?.slug && area?.slug) {
+              try {
+                const resAreas = await fetch(
+                  `/api/locations/governorates/${gov.slug}/cities/${city.slug}/areas?lang=${langParam}`
+                );
+                const areaPayload = await resAreas.json();
+                const areasList = Array.isArray(areaPayload?.areas)
+                  ? areaPayload.areas
+                  : [];
+                setAreas(areasList);
+                const aMatch = areasList.find(
+                  (a) => String(a.slug) === String(area.slug)
+                );
+                if (aMatch) setSelectedArea(aMatch);
+              } catch {
+                setAreas([]);
+                setSelectedArea(null);
+              }
+            }
           }
         }
 
@@ -342,15 +483,18 @@ export default function UpdateListing() {
           landArea: data.building?.landArea ?? "",
           buildYear: data.building?.buildYear ?? "",
           negotiable: Boolean(data.negotiable),
+
+          contactPhone: data.contact?.phone?.replace("+20", "0") || "",
+          whatsapp: data.contact?.whatsapp !== false,
         };
         setForm(f);
       } catch (e) {
-        setSubmitError(e.message || "Failed to load listing");
+        setSubmitError(e.message || t("updateListing.messages.loadError"));
       } finally {
         setLoading(false);
       }
     })();
-  }, [params.listingId]);
+  }, [params.listingId, t, langParam]);
 
   // When governorate changes via UI
   useEffect(() => {
@@ -359,19 +503,66 @@ export default function UpdateListing() {
       setCities([]);
       setSelectedCity(null);
       setOtherCityText("");
+      setAreas([]);
+      setSelectedArea(null);
       return;
     }
-    fetch(`/api/locations/cities/${selectedGov.slug}`)
+    fetch(
+      `/api/locations/governorates/${selectedGov.slug}/cities?lang=${langParam}`
+    )
       .then((r) => r.json())
       .then((data) => {
         if (!active) return;
-        setCities(Array.isArray(data) ? data : []);
+        const list = Array.isArray(data?.cities) ? data.cities : [];
+        setCities(list);
+        setAreas([]);
+        setSelectedArea(null);
+        setSelectedCity((prev) => {
+          if (!prev) return prev;
+          return list.find((c) => c.slug === prev.slug) || null;
+        });
       })
-      .catch(() => setCities([]));
+      .catch(() => {
+        setCities([]);
+        setSelectedCity(null);
+      });
     return () => {
       active = false;
     };
-  }, [selectedGov?.slug]);
+  }, [selectedGov?.slug, langParam]);
+
+  // Load areas when governorate or city changes
+  useEffect(() => {
+    let active = true;
+    if (!selectedGov || !selectedCity) {
+      setAreas([]);
+      setSelectedArea(null);
+      return () => {
+        active = false;
+      };
+    }
+    fetch(
+      `/api/locations/governorates/${selectedGov.slug}/cities/${selectedCity.slug}/areas?lang=${langParam}`
+    )
+      .then((r) => r.json())
+      .then((data) => {
+        if (!active) return;
+        const list = Array.isArray(data?.areas) ? data.areas : [];
+        setAreas(list);
+        setSelectedArea((prev) =>
+          prev
+            ? list.find((a) => String(a.slug) === String(prev.slug)) || null
+            : prev
+        );
+      })
+      .catch(() => {
+        setAreas([]);
+        setSelectedArea(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, [selectedGov?.slug, selectedCity?.slug, langParam]);
 
   // Firebase helpers
   const clearFileInput = () => {
@@ -402,23 +593,31 @@ export default function UpdateListing() {
         }
       );
     });
+  function normalizePhone(raw) {
+    return raw.replace(/[\s\-().]/g, "");
+  }
 
   const handleImageSubmit = async () => {
     const current = images.length;
     const selected = file?.length || 0;
     if (selected === 0) {
-      setImageUploadError("Please select at least one image to upload");
+      setImageUploadError(t("createListing.messages.uploadSelectOne"));
       return;
     }
-    if (selected > 6) {
-      setImageUploadError("You can only select up to 6 images at once");
+    if (selected > MAX_IMAGES) {
+      setImageUploadError(
+        t("createListing.messages.uploadMaxPerBatch", { max: MAX_IMAGES })
+      );
       clearFileInput();
       return;
     }
-    if (current + selected > 6) {
-      const remaining = 6 - current;
+    if (current + selected > MAX_IMAGES) {
+      const remaining = MAX_IMAGES - current;
       setImageUploadError(
-        `You can only upload ${remaining} more image(s). You already have ${current} image(s)`
+        t("createListing.messages.uploadRemaining", {
+          remaining,
+          current,
+        })
       );
       clearFileInput();
       return;
@@ -433,7 +632,7 @@ export default function UpdateListing() {
       setImages((prev) => prev.concat(uploaded));
       setImageUploadError("");
     } catch (err) {
-      setImageUploadError("Image upload failed (2 MB max per image)");
+      setImageUploadError(t("createListing.messages.uploadFailed"));
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -452,41 +651,48 @@ export default function UpdateListing() {
     // validate required fields (excluding address handled via selectors)
     for (const key of visibleFields) {
       if (key === "address") continue;
-      const def = FIELD_DEFS[key];
+      const def = fieldDefs[key];
       if (def?.required && (form[key] === undefined || form[key] === "")) {
-        setSubmitError(`${def.label} is required`);
+        setSubmitError(
+          t("createListing.messages.fieldRequired", { field: def.label })
+        );
         return;
       }
     }
 
     if (!selectedGov) {
-      setSubmitError("Governorate is required");
+      setSubmitError(t("createListing.messages.govRequired"));
       return;
     }
     if (!selectedCity) {
-      setSubmitError("City/Area is required");
+      setSubmitError(t("createListing.messages.cityRequired"));
       return;
     }
 
     const finalImages =
       images && images.length > 0 ? images : [DEFAULT_IMAGE_URL];
 
-    const addressDisplay = `${selectedGov.name} - ${selectedCity.name}${
-      selectedCity.slug === "other" && otherCityText
-        ? ` (${otherCityText})`
-        : ""
-    }`;
+    const locationPayload = {
+      governorate: { slug: selectedGov.slug },
+      city: { slug: selectedCity.slug },
+    };
+    if (selectedArea?.slug) {
+      locationPayload.area = { slug: selectedArea.slug };
+    }
+    if (selectedCity.slug === "other" && otherCityText.trim()) {
+      locationPayload.city_other_text = otherCityText.trim();
+    }
 
     const payload = {
       purpose,
       category,
       ...form,
-      address: addressDisplay,
+
       images: finalImages,
-      location: {
-        governorate: { slug: selectedGov.slug, name: selectedGov.name },
-        city: { slug: selectedCity.slug, name: selectedCity.name },
-        city_other_text: selectedCity.slug === "other" ? otherCityText : "",
+      location: locationPayload,
+      contact: {
+        phone: normalizePhone(form.contactPhone || ""),
+        whatsapp: form.whatsapp !== false,
       },
     };
 
@@ -505,11 +711,12 @@ export default function UpdateListing() {
       );
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.success === false)
-        throw new Error(data?.message || "Update failed");
+        throw new Error(data?.message || t("updateListing.messages.error"));
 
+      setSubmitError("");
       navigate(`/listing/${params.listingId}`);
     } catch (err) {
-      setSubmitError(err.message || "Something went wrong");
+      setSubmitError(err.message || t("updateListing.messages.errorGeneric"));
     } finally {
       setLoading(false);
     }
@@ -519,36 +726,43 @@ export default function UpdateListing() {
     <form
       onSubmit={handleSubmit}
       className="max-w-xl mx-auto p-4 space-y-4 shadow-lg rounded-md mt-16"
+      dir={isAr ? "rtl" : "ltr"}
     >
-      <h1 className="text-2xl font-bold text-center mb-8">Update Listing</h1>
+      <h1 className="text-2xl font-bold text-center mb-8">
+        {t("updateListing.title")}
+      </h1>
 
       {/* Top selectors */}
       <div className="grid grid-cols-2 gap-3 ">
         <label className="flex items-center gap-2 border p-3 rounded-lg">
-          <span className="text-sm text-slate-600">Purpose:</span>
+          <span className="text-sm text-slate-600">
+            {t("createListing.form.purposeLabel")}
+          </span>
           <select
             className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           >
-            {PURPOSES.map((p) => (
-              <option key={p} value={p}>
-                {p[0].toUpperCase() + p.slice(1)}
+            {PURPOSE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
         </label>
 
         <label className="flex items-center gap-2 border p-3 rounded-lg">
-          <span className="text-sm text-slate-600">Type:</span>
+          <span className="text-sm text-slate-600">
+            {t("createListing.form.categoryLabel")}
+          </span>
           <select
             className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
-            {CATEGORIES.map((c) => (
+            {CATEGORY_OPTIONS.map((c) => (
               <option key={c} value={c}>
-                {toTitle(c)}
+                {t(`listing.propertyTypes.${c}`)}
               </option>
             ))}
           </select>
@@ -558,7 +772,7 @@ export default function UpdateListing() {
       {/* Dynamic fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {visibleFields.map((key) => {
-          const def = FIELD_DEFS[key];
+          const def = fieldDefs[key];
           const v = def.type === "checkbox" ? !!form[key] : form[key] ?? "";
 
           if (key === "address") {
@@ -569,7 +783,9 @@ export default function UpdateListing() {
               >
                 {/* Governorate */}
                 <label className="flex flex-col gap-1">
-                  <span className="text-sm">Governorate</span>
+                  <span className="text-sm">
+                    {t("createListing.form.governorateLabel")}
+                  </span>
                   <select
                     className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
                     value={selectedGov?.slug || ""}
@@ -577,14 +793,16 @@ export default function UpdateListing() {
                       const slug = e.target.value;
                       const g = govs.find((x) => x.slug === slug) || null;
                       setSelectedGov(g);
+                      setSelectedCity(null);
+                      setOtherCityText("");
                     }}
                   >
                     <option value="" disabled>
-                      Select Governorate
+                      {t("createListing.form.selectGovernorate")}
                     </option>
                     {govs.map((g) => (
                       <option key={g.slug} value={g.slug}>
-                        {g.name}
+                        {getDisplayName(g)}
                       </option>
                     ))}
                   </select>
@@ -592,7 +810,9 @@ export default function UpdateListing() {
 
                 {/* City */}
                 <label className="flex flex-col gap-1">
-                  <span className="text-sm">City / Area</span>
+                  <span className="text-sm">
+                    {t("createListing.form.cityLabel")}
+                  </span>
                   <select
                     className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
                     value={selectedCity?.slug || ""}
@@ -601,31 +821,49 @@ export default function UpdateListing() {
                       const c =
                         cities.find((x) => String(x.slug) === slug) || null;
                       setSelectedCity(c);
+                      setSelectedArea(null);
+                      if (slug !== "other") setOtherCityText("");
                     }}
                     disabled={!selectedGov}
                   >
                     <option value="" disabled>
-                      {selectedGov ? "Select City" : "Select Governorate first"}
+                      {selectedGov
+                        ? t("createListing.form.selectCity")
+                        : t("createListing.form.selectGovernorateFirst")}
                     </option>
                     {cities.map((c) => (
                       <option key={c.slug} value={c.slug}>
-                        {c.name}
+                        {getDisplayName(c)}
                       </option>
                     ))}
                   </select>
                 </label>
 
-                {/* Other City Free-text when city === other */}
-                {selectedCity?.slug === "other" && (
-                  <label className="flex flex-col gap-1 sm:col-span-2">
-                    <span className="text-sm">Specify Area (optional)</span>
-                    <input
-                      className="border rounded-md px-3 py-2"
-                      type="text"
-                      placeholder="e.g., Near Ring Road, Abu Rawash"
-                      value={otherCityText}
-                      onChange={(e) => setOtherCityText(e.target.value)}
-                    />
+                {selectedCity && Array.isArray(areas) && areas.length > 0 && (
+                  <label className="flex flex-col gap-1">
+                    <span className="text-sm">{t("search.area")}</span>
+                    <select
+                      name="area"
+                      className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
+                      value={selectedArea?.slug || ""}
+                      onChange={(e) => {
+                        const slug = e.target.value;
+                        const a =
+                          areas.find((x) => String(x.slug) === String(slug)) ||
+                          null;
+                        setSelectedArea(a);
+                      }}
+                      disabled={
+                        !selectedGov || !selectedCity || areas.length === 0
+                      }
+                    >
+                      <option value="">{t("search.allAreas")}</option>
+                      {areas.map((a) => (
+                        <option key={a.slug} value={String(a.slug)}>
+                          {getDisplayName(a)}
+                        </option>
+                      ))}
+                    </select>
                   </label>
                 )}
               </div>
@@ -642,11 +880,11 @@ export default function UpdateListing() {
                   onChange={(e) => onChange(key, e.target.value, def)}
                 >
                   <option value="" disabled>
-                    Select {def.label}
+                    {t("createListing.form.selectOption", { field: def.label })}
                   </option>
-                  {def.options.map((o) => (
+                  {def.options?.map((o) => (
                     <option key={o} value={o}>
-                      {toTitle(o)}
+                      {getOptionLabel(key, o)}
                     </option>
                   ))}
                 </select>
@@ -705,6 +943,30 @@ export default function UpdateListing() {
         })}
       </div>
 
+      {/* Contact Phone & WhatsApp */}
+      <span className="text-sm">{t("createListing.form.phoneLabel")}</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label className="flex flex-col gap-1">
+          <input
+            type="tel"
+            id="contactPhone"
+            placeholder="+2010xxxxxxxx"
+            className="border rounded-md px-3 py-2"
+            value={form.contactPhone || ""}
+            onChange={(e) => setForm({ ...form, contactPhone: e.target.value })}
+            required
+          />
+        </label>
+        <label className="inline-flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={form.whatsapp !== false}
+            onChange={(e) => setForm({ ...form, whatsapp: e.target.checked })}
+          />
+          <span>{t("createListing.form.allowWhatsapp")}</span>
+        </label>
+      </div>
+
       {/* Images uploader (Firebase) */}
       <div className="flex flex-col gap-3 sm:col-span-2">
         <div className="flex gap-2">
@@ -723,7 +985,9 @@ export default function UpdateListing() {
             onClick={handleImageSubmit}
             className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-500 transition cursor-pointer disabled:opacity-80"
           >
-            {uploading ? "Uploading..." : "Upload"}
+            {uploading
+              ? t("createListing.actions.uploading")
+              : t("createListing.actions.upload")}
           </button>
         </div>
 
@@ -734,7 +998,9 @@ export default function UpdateListing() {
               style={{ width: `${uploadProgress}%` }}
             ></div>
             <p className="text-sm text-center mt-1">
-              {uploadProgress}% uploaded
+              {t("createListing.messages.uploadProgress", {
+                progress: uploadProgress,
+              })}
             </p>
           </div>
         )}
@@ -759,7 +1025,7 @@ export default function UpdateListing() {
                 onClick={() => handleRemoveImage(index)}
                 className="p-2 text-red-700 rounded-lg uppercase hover:opacity-75"
               >
-                Delete
+                {t("common.delete")}
               </button>
             </div>
           ))}
@@ -775,7 +1041,9 @@ export default function UpdateListing() {
         disabled={uploading || loading}
         className="w-full rounded-lg px-4 py-3 text-white cursor-pointer hover:bg-blue-500 bg-indigo-600 disabled:opacity-70"
       >
-        {loading ? "Updating…" : "Update Listing"}
+        {loading
+          ? t("updateListing.actions.updating")
+          : t("updateListing.actions.submit")}
       </button>
     </form>
   );

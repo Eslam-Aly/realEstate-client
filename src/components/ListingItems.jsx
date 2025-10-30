@@ -74,6 +74,34 @@ function ListingItems({ listing }) {
   const sizeText =
     sizeValue !== undefined ? `${Number(sizeValue).toLocaleString()} sqm` : "-";
 
+  // Location helpers align with the detail page so cards switch language too.
+  const isAr = i18n.language?.startsWith("ar");
+  const getLocalizedName = (obj) => {
+    if (!obj) return "";
+    if (typeof obj === "string") return obj;
+    const name = isAr ? obj?.nameAr || obj?.name : obj?.name || obj?.nameAr;
+    return name || "";
+  };
+
+  const getDisplayAddress = (l) => {
+    const loc = l?.location || {};
+    const gov = loc?.governorate;
+    const city = loc?.city;
+    const area = loc?.area;
+
+    if (city && area) {
+      return `${getLocalizedName(city)} - ${getLocalizedName(area)}`.trim();
+    }
+    if (gov && city) {
+      return `${getLocalizedName(gov)} - ${getLocalizedName(city)}`.trim();
+    }
+    if (city) return getLocalizedName(city);
+    if (gov) return getLocalizedName(gov);
+    return l?.address || "";
+  };
+
+  const displayAddress = getDisplayAddress(listing);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentUser } = useSelector((s) => s.user);
@@ -171,7 +199,7 @@ function ListingItems({ listing }) {
 
           <div className="flex items-center gap-1 text-slate-600">
             <MdLocationOn className="h-4 w-4 text-blue-700" />
-            <p className="text-sm truncate w-full">{listing?.address || "-"}</p>
+            <p className="text-sm truncate w-full">{displayAddress || "-"}</p>
           </div>
 
           <div className="mt-1 font-semibold flex items-center gap-2">
@@ -189,7 +217,11 @@ function ListingItems({ listing }) {
             <div className="flex items-center gap-1 text-xs font-bold">
               <FaBed className="text-blue-700" />
               <span>
-                {beds !== undefined ? `${beds} ${t("listing.beds")}` : "-"}
+                {beds !== undefined
+                  ? `${beds} ${
+                      beds === 1 ? t("listing.bed") : t("listing.beds")
+                    }`
+                  : "-"}
               </span>
             </div>
             <div className="flex items-center gap-1 text-xs font-bold">

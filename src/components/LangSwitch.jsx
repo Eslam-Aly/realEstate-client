@@ -7,9 +7,9 @@ export default function LangSwitch() {
   return (
     <button
       onClick={() => i18n.changeLanguage(nextLang)}
-      className="text-sm  text-white  cursor-pointer hover:scale-105 transition-transform"
+      className="text-sm  text-white px-2 py-1 cursor-pointer hover:scale-105 transition-transform"
     >
-      {nextLang.toUpperCase()}
+      {nextLang === "en" ? "EN" : "ع"}
     </button>
   );
 }

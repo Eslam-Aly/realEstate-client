@@ -31,7 +31,37 @@ import {
   FaRulerCombined,
 } from "react-icons/fa";
 import { LuMessageCircleMore } from "react-icons/lu";
+import { useTranslation } from "react-i18next";
 function Listing() {
+  // --- Language-aware location rendering ---
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language.startsWith("ar");
+
+  const getLocalizedName = (obj) => {
+    if (!obj) return "";
+    return isAr ? obj.nameAr || obj.name || "" : obj.name || obj.nameAr || "";
+  };
+
+  const getDisplayAddress = (listing) => {
+    const loc = listing?.location || {};
+    const gov = loc.governorate;
+    const city = loc.city;
+    const area = loc.area;
+
+    if (city && area) {
+      // If area exists, show only City - Area
+      return `${getLocalizedName(city)} - ${getLocalizedName(area)}`;
+    } else if (gov && city) {
+      // If no area, show Governorate - City
+      return `${getLocalizedName(gov)} - ${getLocalizedName(city)}`;
+    } else if (city) {
+      return getLocalizedName(city);
+    } else if (gov) {
+      return getLocalizedName(gov);
+    } else {
+      return listing?.address || "";
+    }
+  };
   // --- Helpers to normalize backend shapes/types ---
   const asBool = (v) => v === true || v === "true" || v === 1 || v === "1";
   const asNum = (v) =>
@@ -223,6 +253,13 @@ function Listing() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const phone = listing?.contact?.phone || "";
+  const waEnabled = listing?.contact?.whatsapp !== false;
+  const msg = encodeURIComponent(
+    `${t("listing.hello")} - ${listing?.title || ""}`
+  );
+  const waLink = `https://wa.me/${phone.replace(/^\+/, "")}?text=${msg}`;
+
   // compute id as string for favorites
   const listingId = String(listing?._id || "");
 
@@ -363,13 +400,13 @@ function Listing() {
   }, [createdId]);
   if (loading) {
     return (
-      <p className="text-center mt-20 text-2xl font-semibold">Loading...</p>
+      <p className="text-center mt-20 text-2xl font-semibold">{t("loading")}</p>
     );
   }
   if (error) {
     return (
       <p className="text-center mt-20 text-2xl font-semibold">
-        Error loading listing.
+        {t("errorLoading")}
       </p>
     );
   }
@@ -442,54 +479,76 @@ function Listing() {
                       : "bg-amber-100 text-amber-700"
                   }`}
                 >
-                  {getPurpose(listing) === "rent" ? "For Rent" : "For Sale"}
+                  {getPurpose(listing) === "rent"
+                    ? t("listing.forRent")
+                    : t("listing.forSale")}
                 </span>
               )}
               {getCategory(listing) && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-slate-100 text-slate-700">
-                  {toTitle(getCategory(listing))}
+                  {toTitle(
+                    t(
+                      `listing.propertyTypes.${getCategory(
+                        listing
+                      )?.toLowerCase()}`,
+                      {
+                        defaultValue: t("listing.propertyTypes.other"),
+                      }
+                    )
+                  )}
                 </span>
               )}
             </div>
             <div className="flex items-center gap-3">
               <p className="text-2xl font-semibold text-gray-600">
                 {getPrice(listing) !== undefined
-                  ? `$${getPrice(listing).toLocaleString()}`
+                  ? `${getPrice(listing).toLocaleString()} ${t(
+                      "listing.price"
+                    )}`
                   : "Price on request"}
               </p>
               {getNegotiable(listing) && (
                 <span className="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-xs font-medium">
-                  Negotiable
+                  {t("listing.negotiable")}
                 </span>
               )}
             </div>
           </div>
 
           <section className="mb-6">
-            <h2 className="text-xl font-semibold mb-3">Property Details</h2>
+            <h2 className="text-xl font-semibold mb-3">
+              {t("listing.propertyDetails")}
+            </h2>
             <ul className="flex flex-wrap gap-4 text-lg">
               {/* Always show location and date */}
-              <li className="text-blue-600">
-                <FaMapMarkerAlt className="inline-block mr-2" />
-                Location: {getAddress(listing) || "N/A"}
+              <li className="text-blue-600 ">
+                <FaMapMarkerAlt className="inline-block mx-1" />
+                {t("listing.location")}: {getDisplayAddress(listing) || "N/A"}
               </li>
               <li className="text-blue-600">
-                <FaCalendarAlt className="inline-block mr-2" />
-                Listed on:{" "}
+                <FaCalendarAlt className="inline-block mx-1" />
+                {t("listing.listedOn")}:{" "}
                 {listing.createdAt
                   ? new Date(listing.createdAt).toLocaleDateString()
                   : "N/A"}
               </li>
               <li className="text-blue-600">
-                Purpose:{" "}
+                {t("search.purpose")}:{" "}
                 {getPurpose(listing) === "rent"
-                  ? "For Rent"
+                  ? t("listing.forRent")
                   : getPurpose(listing) === "sale"
-                  ? "For Sale"
+                  ? t("listing.forSale")
                   : "N/A"}
               </li>
               <li className="text-blue-600">
-                Type: {toTitle(getCategory(listing))}
+                {t("listing.type")}:{" "}
+                {toTitle(
+                  t(
+                    `listing.propertyTypes.${getCategory(
+                      listing
+                    ).toLowerCase()}` || "listing.propertyTypes.other"
+                  )
+                )}
               </li>
 
               {/* Category-specific blocks */}
@@ -500,77 +559,118 @@ function Listing() {
                   return (
                     <>
                       <li className="text-blue-600">
-                        <FaRulerCombined className="inline-block mr-2" />
-                        Size: {fmtNum(getSize(listing), " sqm")}
+                        <FaRulerCombined className="inline-block mx-1" />
+                        {t("listing.size")}:{" "}
+                        {fmtNum(getSize(listing), " " + t("listing.sizeUnit"))}
                       </li>
                       <li className="text-blue-600">
-                        <FaBed className="inline-block mr-2" />
-                        Bedrooms: {fmtNum(getBedrooms(listing))}
+                        <FaBed className="inline-block mx-1" />
+                        {t("listing.beds")}: {fmtNum(getBedrooms(listing))}
                       </li>
                       <li className="text-blue-600">
-                        <FaBath className="inline-block mr-2" />
-                        Bathrooms: {fmtNum(getBathrooms(listing))}
+                        <FaBath className="inline-block mx-1" />
+                        {t("listing.baths")}: {fmtNum(getBathrooms(listing))}
                       </li>
                       <li className="text-blue-600">
-                        <FaChair className="inline-block mr-2" />
-                        Furnished: {fmtYesNo(getFurnished(listing))}
+                        <FaChair className="inline-block mx-1" />
+                        {t("listing.furnished")}:{" "}
+                        {fmtYesNo(getFurnished(listing)) === "Yes"
+                          ? t("listing.yes")
+                          : fmtYesNo(getFurnished(listing)) === "No"
+                          ? t("listing.no")
+                          : "N/A"}
                       </li>
                       <li className="text-blue-600">
-                        <FaParking className="inline-block mr-2" />
-                        Parking: {fmtYesNo(getParking(listing))}
+                        <FaParking className="inline-block mx-1" />
+                        {t("listing.parking")}:{" "}
+                        {fmtYesNo(getParking(listing)) === "Yes"
+                          ? t("listing.yes")
+                          : fmtYesNo(getParking(listing)) === "No"
+                          ? t("listing.no")
+                          : "N/A"}
                       </li>
                       <li className="text-blue-600">
-                        Floor: {fmtNum(getFloor(listing))}
-                      </li>
-                    </>
-                  );
-                }
-
-                if (cat === "villa") {
-                  return (
-                    <>
-                      <li className="text-blue-600">
-                        <FaRulerCombined className="inline-block mr-2" />
-                        Size: {fmtNum(getSize(listing), " sqm")}
-                      </li>
-                      <li className="text-blue-600">
-                        <FaBed className="inline-block mr-2" />
-                        Bedrooms: {fmtNum(getBedrooms(listing))}
-                      </li>
-                      <li className="text-blue-600">
-                        <FaBath className="inline-block mr-2" />
-                        Bathrooms: {fmtNum(getBathrooms(listing))}
-                      </li>
-                      <li className="text-blue-600">
-                        <FaChair className="inline-block mr-2" />
-                        Furnished: {fmtYesNo(getFurnished(listing))}
-                      </li>
-                      <li className="text-blue-600">
-                        <FaParking className="inline-block mr-2" />
-                        Parking: {fmtYesNo(getParking(listing))}
-                      </li>
-                      <li className="text-blue-600">
-                        Land Area: {fmtNum(getLandArea(listing), " sqm")}
+                        {t("listing.floor")}: {fmtNum(getFloor(listing))}
                       </li>
                     </>
                   );
                 }
 
-                if (cat === "land") {
+                if (cat === "villa" || cat === "فيلا") {
                   return (
                     <>
                       <li className="text-blue-600">
-                        <FaRulerCombined className="inline-block mr-2" />
-                        Plot Area: {fmtNum(getSize(listing), " sqm")}
+                        <FaRulerCombined className="inline-block mx-1" />
+                        {t("listing.size")}:{" "}
+                        {fmtNum(getSize(listing), " " + t("listing.sizeUnit"))}
                       </li>
                       <li className="text-blue-600">
-                        Frontage: {fmtNum(getFrontage(listing), " m")}
+                        <FaBed className="inline-block mx-1" />
+                        {t("listing.beds")}: {fmtNum(getBedrooms(listing))}
                       </li>
                       <li className="text-blue-600">
-                        Zoning: {fmtText(getZoning(listing))}
+                        <FaBath className="inline-block mx-1" />
+                        {t("listing.baths")}: {fmtNum(getBathrooms(listing))}
                       </li>
                       <li className="text-blue-600">
-                        Corner Lot: {fmtYesNo(getCornerLot(listing))}
+                        <FaChair className="inline-block mx-1" />
+                        {t("listing.furnished")}:{" "}
+                        {fmtYesNo(getFurnished(listing)) === "Yes"
+                          ? t("listing.yes")
+                          : fmtYesNo(getFurnished(listing)) === "No"
+                          ? t("listing.no")
+                          : "N/A"}
+                      </li>
+                      <li className="text-blue-600">
+                        <FaParking className="inline-block mx-1" />
+                        {t("listing.parking")}:{" "}
+                        {fmtYesNo(getParking(listing)) === "Yes"
+                          ? t("listing.yes")
+                          : fmtYesNo(getParking(listing)) === "No"
+                          ? t("listing.no")
+                          : "N/A"}
+                      </li>
+                      <li className="text-blue-600">
+                        {t("listing.landArea")}:{" "}
+                        {fmtNum(
+                          getLandArea(listing),
+                          " " + t("listing.sizeUnit")
+                        )}
+                      </li>
+                    </>
+                  );
+                }
+
+                if (cat === "land" || cat === "أرض") {
+                  return (
+                    <>
+                      <li className="text-blue-600">
+                        <FaRulerCombined className="inline-block mx-1" />
+                        {t("listing.plotArea")}:{" "}
+                        {fmtNum(getSize(listing), " " + t("listing.sizeUnit"))}
+                      </li>
+                      <li className="text-blue-600">
+                        {t("listing.frontage")}:{" "}
+                        {fmtNum(getFrontage(listing), " " + t("listing.meter"))}
+                      </li>
+                      <li className="text-blue-600">
+                        {t("listing.zoning")}:{" "}
+                        {t(
+                          `listing.zoningTypes.${String(
+                            getZoning(listing) || ""
+                          )
+                            .toLowerCase()
+                            .trim()}`,
+                          { defaultValue: "N/A" }
+                        )}
+                      </li>
+                      <li className="text-blue-600">
+                        {t("listing.cornerLot")}:{" "}
+                        {fmtYesNo(getCornerLot(listing)) === "Yes"
+                          ? t("listing.yes")
+                          : fmtYesNo(getCornerLot(listing)) === "No"
+                          ? t("listing.no")
+                          : "N/A"}
                       </li>
                     </>
                   );
@@ -581,19 +681,28 @@ function Listing() {
                     <>
                       <li className="text-blue-600">
                         <FaRulerCombined className="inline-block mr-2" />
-                        Floor Area: {fmtNum(getSize(listing), " sqm")}
+                        {t("listing.floorArea")}:{" "}
+                        {fmtNum(getSize(listing), " " + t("listing.sizeUnit"))}
                       </li>
                       <li className="text-blue-600">
-                        Frontage: {fmtNum(getFrontage(listing), " m")}
+                        {t("listing.frontage")}:{" "}
+                        {fmtNum(getFrontage(listing), " " + t("listing.meter"))}
                       </li>
                       <li className="text-blue-600">
-                        License: {fmtText(getLicenseType(listing))}
+                        {t("listing.license")}:{" "}
+                        {fmtText(getLicenseType(listing))}
                       </li>
                       <li className="text-blue-600">
-                        Mezzanine: {fmtYesNo(getHasMezz(listing))}
+                        {t("listing.mezzanine")}:{" "}
+                        {fmtYesNo(getHasMezz(listing)) === "Yes"
+                          ? t("listing.yes")
+                          : fmtYesNo(getHasMezz(listing)) === "No"
+                          ? t("listing.no")
+                          : "N/A"}
                       </li>
                       <li className="text-blue-600">
-                        Parking Spots: {fmtNum(getParkingSpots(listing))}
+                        {t("listing.parkingSpots")}:{" "}
+                        {fmtNum(getParkingSpots(listing))}
                       </li>
                     </>
                   );
@@ -603,14 +712,17 @@ function Listing() {
                   return (
                     <>
                       <li className="text-blue-600">
-                        <FaRulerCombined className="inline-block mr-2" />
-                        Floor Area: {fmtNum(getSize(listing), " sqm")}
+                        <FaRulerCombined className="inline-block mx-1" />
+                        {t("listing.floorArea")}:{" "}
+                        {fmtNum(getSize(listing), " " + t("listing.sizeUnit"))}
                       </li>
                       <li className="text-blue-600">
-                        License: {fmtText(getLicenseType(listing))}
+                        {t("listing.license")}:{" "}
+                        {fmtText(getLicenseType(listing))}
                       </li>
                       <li className="text-blue-600">
-                        Parking Spots: {fmtNum(getParkingSpots(listing))}
+                        {t("listing.parkingSpots")}:{" "}
+                        {fmtNum(getParkingSpots(listing))}
                       </li>
                     </>
                   );
@@ -620,19 +732,31 @@ function Listing() {
                   return (
                     <>
                       <li className="text-blue-600">
-                        Total Floors: {fmtNum(getTotalFloors(listing))}
+                        {t("listing.totalFloors")}:{" "}
+                        {fmtNum(getTotalFloors(listing))}
                       </li>
                       <li className="text-blue-600">
-                        Total Units: {fmtNum(getTotalUnits(listing))}
+                        {t("listing.totalUnits")}:{" "}
+                        {fmtNum(getTotalUnits(listing))}
                       </li>
                       <li className="text-blue-600">
-                        Elevator: {fmtYesNo(getElevator(listing))}
+                        {t("listing.elevator")}:{" "}
+                        {fmtYesNo(getElevator(listing)) === "Yes"
+                          ? t("listing.yes")
+                          : fmtYesNo(getElevator(listing)) === "No"
+                          ? t("listing.no")
+                          : "N/A"}
                       </li>
                       <li className="text-blue-600">
-                        Land Area: {fmtNum(getLandArea(listing), " sqm")}
+                        {t("listing.landArea")}:{" "}
+                        {fmtNum(
+                          getLandArea(listing),
+                          " " + t("listing.sizeUnit")
+                        )}
                       </li>
                       <li className="text-blue-600">
-                        Build Year: {fmtNum(getBuildYear(listing))}
+                        {t("listing.buildYear")}:{" "}
+                        {fmtNum(getBuildYear(listing))}
                       </li>
                     </>
                   );
@@ -642,40 +766,53 @@ function Listing() {
                 return (
                   <>
                     <li className="text-blue-600">
-                      <FaRulerCombined className="inline-block mr-2" />
-                      Size: {fmtNum(getSize(listing), " sqm")}
+                      <FaRulerCombined className="inline-block mx-1" />
+                      {t("listing.size")}:{" "}
+                      {fmtNum(getSize(listing), " " + t("listing.sizeUnit"))}
                     </li>
                     <li className="text-blue-600">
-                      <FaBed className="inline-block mr-2" />
-                      Bedrooms: {fmtNum(getBedrooms(listing))}
+                      <FaBed className="inline-block mx-1" />
+                      {t("listing.beds")}: {fmtNum(getBedrooms(listing))}
                     </li>
                     <li className="text-blue-600">
-                      <FaBath className="inline-block mr-2" />
-                      Bathrooms: {fmtNum(getBathrooms(listing))}
+                      <FaBath className="inline-block mx-1" />
+                      {t("listing.baths")}: {fmtNum(getBathrooms(listing))}
                     </li>
                     <li className="text-blue-600">
-                      Floor: {fmtNum(getFloor(listing))}
+                      {t("listing.floor")}: {fmtNum(getFloor(listing))}
                     </li>
                     <li className="text-blue-600">
-                      Parking: {fmtYesNo(getParking(listing))}
+                      {t("listing.parking")}:{" "}
+                      {fmtYesNo(getParking(listing)) === "Yes"
+                        ? t("listing.yes")
+                        : fmtYesNo(getParking(listing)) === "No"
+                        ? t("listing.no")
+                        : "N/A"}
                     </li>
                     <li className="text-blue-600">
-                      Land Area: {fmtNum(getLandArea(listing), " sqm")}
+                      {t("listing.landArea")}:{" "}
+                      {fmtNum(
+                        getLandArea(listing),
+                        " " + t("listing.sizeUnit")
+                      )}
                     </li>
                     <li className="text-blue-600">
-                      Frontage: {fmtNum(getFrontage(listing), " m")}
+                      {t("listing.frontage")}:{" "}
+                      {fmtNum(getFrontage(listing), " " + t("listing.meter"))}
                     </li>
                     <li className="text-blue-600">
-                      License: {fmtText(getLicenseType(listing))}
+                      {t("listing.license")}: {fmtText(getLicenseType(listing))}
                     </li>
                   </>
                 );
               })()}
             </ul>
           </section>
-          <div className="text-lg space-y-2">
+          <div className="text-lg space-y-2 mb-6">
             <p className="text-gray-700 flex flex-col">
-              <strong className="inline-block mr-2">Description:</strong>
+              <strong className="inline-block mr-2">
+                {t("listing.description")}:
+              </strong>
             </p>
             <p>{listing.description}</p>
           </div>
@@ -687,23 +824,42 @@ function Listing() {
                   to={`/update-listing/${listing._id}`}
                   className="px-9 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:opacity-90 cursor-pointer"
                 >
-                  Edit
+                  {t("listing.edit")}
                 </Link>
                 <button
                   type="button"
                   onClick={handleDelete}
                   className="px-6 py-2 rounded-lg bg-red-600 text-white font-semibold hover:opacity-90 cursor-pointer"
                 >
-                  Delete
+                  {t("listing.delete")}
                 </button>
               </div>
             ) : (
               // Non-owner view: interaction icons
-
-              <button className=" mt-6 py-4 px-12 rounded-lg bg-blue-600 w-fit text-white flex items-center hover:bg-blue-500 cursor-pointer">
-                <span className="pr-4">Contact Seller</span>
-                <LuMessageCircleMore className=" size-6 inline-block" />
-              </button>
+              <ul className="flex gap-2">
+                {phone && (
+                  <li>
+                    <a
+                      className="btn bg-blue-700 text-white hover:bg-blue-800 rounded-lg cursor-pointer py-4 px-6 transition"
+                      href={`tel:${phone}`}
+                    >
+                      {t("listing.callSeller")}
+                    </a>
+                  </li>
+                )}
+                {waEnabled && phone && (
+                  <li>
+                    <a
+                      className="btn rounded-lg bg-green-600 text-white hover:bg-green-700 px-6 py-4 transition"
+                      href={waLink}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {t("listing.contactWhatsApp")}
+                    </a>
+                  </li>
+                )}
+              </ul>
             )
           ) : null}
 
@@ -711,13 +867,13 @@ function Listing() {
           <section className="mt-12">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-slate-800">
-                Similar Listings
+                {t("listing.similarListings")}
               </h2>
               <Link
                 to={`/search?${similarQuery}`}
                 className="text-blue-700 hover:underline text-sm"
               >
-                See more
+                {t("search.showMoreListings")}
               </Link>
             </div>
 
@@ -732,7 +888,7 @@ function Listing() {
               </div>
             ) : similar.length === 0 ? (
               <p className="text-slate-500 text-sm">
-                No similar listings found.
+                {t("listing.noSimilarListings")}
               </p>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -746,7 +902,7 @@ function Listing() {
           {/* Listed By (owner) */}
           <section className="mt-12">
             <h2 className="text-xl font-semibold text-slate-800 mb-4">
-              Listed by
+              {t("listing.listedBy")}
             </h2>
 
             {ownerLoading ? (
@@ -767,15 +923,19 @@ function Listing() {
                   className="w-14 h-14 rounded-full object-cover ring-1 ring-slate-200"
                 />
                 <div className="flex-1">
-                  <p className="font-semibold text-slate-800">Seller</p>
-                  <p className="text-sm text-slate-500">Member</p>
+                  <p className="font-semibold text-slate-800">
+                    {t("listing.seller")}
+                  </p>
+                  <p className="text-sm text-slate-500">
+                    {t("listing.member")}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Link
                     to={`/search?userRef=${listing?.userRef || ""}`}
                     className="text-blue-700 hover:underline text-sm"
                   >
-                    See more from this seller
+                    {t("listing.seeMoreFromThisSeller")}
                   </Link>
                 </div>
               </div>
@@ -788,14 +948,14 @@ function Listing() {
                 />
                 <div className="flex-1">
                   <p className="font-semibold text-slate-800">
-                    {owner?.username || owner?.name || "Seller"}
+                    {owner?.username || owner?.name || t("listing.seller")}
                   </p>
                   <p className="text-sm text-slate-500">
                     {owner?.createdAt
-                      ? `Member since ${new Date(
+                      ? `${t("listing.memberSince")} ${new Date(
                           owner.createdAt
                         ).toLocaleDateString()}`
-                      : "Member"}
+                      : t("listing.member")}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -803,7 +963,7 @@ function Listing() {
                     to={`/search?userRef=${listing?.userRef || ""}`}
                     className="text-blue-700 hover:underline text-sm"
                   >
-                    See more from this seller
+                    {t("listing.seeMoreFromThisSeller")}
                   </Link>
                 </div>
               </div>
