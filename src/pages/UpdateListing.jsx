@@ -157,10 +157,6 @@ const FIELD_CONFIG = {
     min: 1900,
     max: new Date().getFullYear(),
   },
-  negotiable: {
-    labelKey: "createListing.fields.negotiable",
-    type: "checkbox",
-  },
 };
 
 /** 3) Category → which fields show */
