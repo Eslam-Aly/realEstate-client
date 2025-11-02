@@ -26,6 +26,8 @@ function OAuth() {
           photo: result.user.photoURL,
         }),
       });
+      if (!res.ok) throw new Error("Google authentication failed");
+
       const data = await res.json();
       dispatch(signInSuccess(data));
       navigate("/");
@@ -39,7 +41,7 @@ function OAuth() {
       onClick={handleGoogleClick}
       className="border p-3 rounded-lg w-full flex justify-center items-center gap-3 hover:shadow-md transition-shadow duration-150 ease-in-out cursor-pointer"
     >
-      Continue Google
+      Continue with Google
     </button>
   );
 }
