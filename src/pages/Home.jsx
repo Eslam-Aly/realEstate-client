@@ -87,7 +87,9 @@ function Home() {
     }
     (async () => {
       try {
-        const res = await fetch(`${API}/locations/governorates/${govSlug}/cities`);
+        const res = await fetch(
+          `${API}/locations/governorates/${govSlug}/cities`
+        );
         const data = await res.json();
         if (!alive) return;
         // Accept several possible shapes from the API and normalize
@@ -152,7 +154,7 @@ function Home() {
         />
 
         {/* Dark/gradient overlay for readability */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-black/80 via-black/30 to-transparent" />
+        <div className="absolute inset-0 -z-10 bg-linear-gradient-to-tr from-black/80 via-black/30 to-transparent" />
 
         {/* Content (top-left) */}
         <div className="mx-auto max-w-7xl px-5 pt-16 md:px-10 md:pt-24">
