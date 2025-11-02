@@ -700,6 +700,7 @@ export default function UpdateListing() {
           "Content-Type": "application/json",
           ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
         },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
       const data = await res.json().catch(() => ({}));

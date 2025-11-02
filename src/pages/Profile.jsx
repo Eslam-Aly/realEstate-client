@@ -58,6 +58,7 @@ function Profile() {
         setFavLoading(true);
         setFavError("");
         const res = await fetch(`${API}/favorites?limit=6`, {
+          credentials: "include",
           headers: authHeaders(),
         });
         if (!res.ok) throw new Error(`Favorites fetch failed (${res.status})`);
@@ -129,6 +130,7 @@ function Profile() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
       const data = await res.json();
@@ -147,6 +149,7 @@ function Profile() {
       dispatch(deleteUserStart());
       const res = await fetch(`${API}/user/delete/${currentUser._id}`, {
         method: "DELETE",
+        credentials: "include",
       });
       const data = await res.json();
       if (data.success === false) {
@@ -161,7 +164,9 @@ function Profile() {
   const handleSignOut = async () => {
     try {
       dispatch(signOutStart());
-      const res = await fetch(`${API}/auth/signout`);
+      const res = await fetch(`${API}/auth/signout`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (data.success === false) {
         dispatch(signOutFaliure(data.message));
@@ -175,7 +180,9 @@ function Profile() {
   const handleShowListings = async () => {
     try {
       setShowListingsError(false);
-      const res = await fetch(`${API}/user/listings/${currentUser._id}`);
+      const res = await fetch(`${API}/user/listings/${currentUser._id}`, {
+        credentials: "include",
+      });
       console.log(res);
       console.log(currentUser._id);
       const data = await res.json();
@@ -198,6 +205,7 @@ function Profile() {
         "";
       const res = await fetch(`${API}/listings/delete/${listingId}`, {
         method: "DELETE",
+        credentials: "include",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json().catch(() => ({}));

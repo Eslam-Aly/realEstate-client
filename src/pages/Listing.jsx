@@ -304,6 +304,7 @@ function Listing() {
         "";
       const res = await fetch(`${API}/listings/delete/${listing._id}`, {
         method: "DELETE",
+        credentials: "include",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json().catch(() => ({}));
