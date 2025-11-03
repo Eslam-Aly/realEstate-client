@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import API from "../../../api/index.js";
+import API from "../../config/api.js";
 
 /**
  * Pulls the persisted favourite listing ids from the backend when the app boots.

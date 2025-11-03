@@ -7,7 +7,7 @@ import {
   signInStart,
   signInSuccess,
 } from "../redux/user/userSlice.js";
-import API from "../../api/index.js";
+import API from "../config/api.js";
 
 function SignIn() {
   const dispatch = useDispatch();

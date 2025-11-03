@@ -2,7 +2,7 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import API from "../../api/index.js";
+import API from "../config/api.js";
 
 const DEFAULT_IMAGE_URL =
   import.meta?.env?.VITE_DEFAULT_LISTING_IMAGE || "/placeholder.jpg";
@@ -634,7 +634,7 @@ export default function CreateListingForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-xl mx-auto p-4 space-y-4 shadow-lg rounded-md mt-16"
+      className="max-w-xl mx-auto p-4 space-y-4 shadow-lg rounded-md mt-16 overflow-x-hidden"
       dir={isAr ? "rtl" : "ltr"}
     >
       <h1 className="text-2xl font-bold text-center mb-8">
@@ -899,10 +899,10 @@ export default function CreateListingForm() {
 
       {/* Images uploader (Firebase) */}
       <div className="flex flex-col gap-3 sm:col-span-2">
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <input
             ref={fileRef}
-            className="border p-3 rounded-lg cursor-pointer hover:bg-gray-100 transition"
+            className="border p-3 rounded-lg cursor-pointer hover:bg-gray-100 transition w-full"
             type="file"
             name="images"
             multiple
@@ -913,7 +913,7 @@ export default function CreateListingForm() {
             type="button"
             disabled={uploading}
             onClick={handleImageSubmit}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-500 transition cursor-pointer disabled:opacity-80"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-500 transition cursor-pointer disabled:opacity-80 w-full sm:w-auto"
           >
             {uploading
               ? t("createListing.actions.uploading")

@@ -32,7 +32,7 @@ import {
 } from "react-icons/fa";
 import { LuMessageCircleMore } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
-import API from "../../api/index.js";
+import API from "../config/api.js";
 function Listing() {
   // --- Language-aware location rendering ---
   const { t, i18n } = useTranslation();

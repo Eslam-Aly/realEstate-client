@@ -3,7 +3,7 @@ import { app } from "../firebase.js";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice.js";
 import { useNavigate } from "react-router-dom";
-import API from "../../api/index.js";
+import API from "../config/api.js";
 
 function OAuth() {
   const navigate = useNavigate();

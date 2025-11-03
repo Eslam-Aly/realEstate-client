@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import ListingItems from "../components/ListingItems";
 import heroImage from "../assets/hero.jpg";
 import { useTranslation } from "react-i18next";
-import API from "../../api/index.js";
+import API from "../config/api.js";
 
 function Home() {
   const { t, i18n } = useTranslation();
@@ -154,7 +154,7 @@ function Home() {
         />
 
         {/* Dark/gradient overlay for readability */}
-        <div className="absolute inset-0 -z-10 bg-linear-gradient-to-tr from-black/80 via-black/30 to-transparent" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-black/80 via-black/30 to-transparent" />
 
         {/* Content (top-left) */}
         <div className="mx-auto max-w-7xl px-5 pt-16 md:px-10 md:pt-24">

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth.jsx";
-import API from "../../api/index.js";
+import API from "../config/api.js";
 
 function SignUp() {
   const [error, setError] = React.useState(null);

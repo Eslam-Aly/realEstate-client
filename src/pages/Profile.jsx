@@ -23,7 +23,7 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import ListingItems from "../components/ListingItems.jsx";
 import { useTranslation } from "react-i18next";
-import API from "../../api/index.js";
+import API from "../config/api.js";
 
 function Profile() {
   const { t } = useTranslation();

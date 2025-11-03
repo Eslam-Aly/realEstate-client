@@ -139,13 +139,13 @@ function ListingItems({ listing }) {
   };
 
   return (
-    <div className="bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[330px] mr-4">
+    <div className="bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[330px] sm:mx-auto">
       <Link to={`/listing/${id}`}>
         <div className="relative">
           <img
             src={img}
             alt="listing cover"
-            className="h-320px sm:h-220px w-full object-cover hover:scale-105 transition-transform duration-300"
+            className="h-[320px] sm:h-[220px] w-full object-cover hover:scale-105 transition-transform duration-300"
             onError={(e) => {
               if (e.currentTarget.src !== "/placeholder.jpg") {
                 e.currentTarget.src = "/placeholder.jpg";

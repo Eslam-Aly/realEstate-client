@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import ListingItems from "../components/ListingItems.jsx";
-import API from "../../api/index.js";
+import API from "../config/api.js";
 
 /**
  * Lists the current user's saved listings. Anonymous visitors are redirected
