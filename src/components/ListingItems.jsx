@@ -145,7 +145,7 @@ function ListingItems({ listing }) {
           <img
             src={img}
             alt="listing cover"
-            className="h-[320px] sm:h-[220px] w-full object-cover hover:scale-105 transition-transform duration-300"
+            className="h-320px sm:h-220px w-full object-cover hover:scale-105 transition-transform duration-300"
             onError={(e) => {
               if (e.currentTarget.src !== "/placeholder.jpg") {
                 e.currentTarget.src = "/placeholder.jpg";
