@@ -1,4 +1,5 @@
 import React from "react";
+import { t } from "i18next";
 
 // Basic, responsive footer that matches a modern real-estate site layout.
 // Uses Tailwind utility classes and keeps styling neutral so it blends with your
@@ -22,12 +23,11 @@ const Footer = () => {
                 aria-hidden="true"
               />
               <span className="text-lg font-semibold tracking-tight text-blue-700">
-                Logo
+                {t("footer.aqarDot")}
               </span>
             </div>
             <p className="mt-3 text-sm leading-6 text-gray-500">
-              Find your next home across Egypt. Buy, rent, or list properties
-              with transparent details and up‑to‑date insights.
+              {t("footer.paragraph")}
             </p>
             {/* Social links */}
             <div
@@ -98,81 +98,89 @@ const Footer = () => {
             aria-label="Footer Navigation"
           >
             <div>
-              <h3 className="mb-3 font-semibold text-blue-700">Explore</h3>
+              <h3 className="mb-3 font-semibold text-blue-700">
+                {t("footer.explore.title")}
+              </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
                   <a className="hover:underline" href="/listings?type=sale">
-                    Buy
+                    {t("footer.explore.buy")}
                   </a>
                 </li>
                 <li>
                   <a className="hover:underline" href="/listings?type=rent">
-                    Rent
+                    {t("footer.explore.rent")}
                   </a>
                 </li>
                 <li>
                   <a className="hover:underline" href="/list">
-                    List a property
+                    {t("footer.explore.list")}
                   </a>
                 </li>
               </ul>
             </div>
             <div>
-              <h3 className="mb-3 font-semibold text-blue-700">Company</h3>
+              <h3 className="mb-3 font-semibold text-blue-700">
+                {t("footer.company.title")}
+              </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
                   <a className="hover:underline" href="/about">
-                    About
+                    {t("footer.company.about")}
                   </a>
                 </li>
                 <li>
                   <a className="hover:underline" href="/contact">
-                    Contact
+                    {t("footer.company.contact")}
                   </a>
                 </li>
                 <li>
                   <a className="hover:underline" href="/careers">
-                    Careers
+                    {t("footer.company.careers")}
                   </a>
                 </li>
               </ul>
             </div>
             <div>
-              <h3 className="mb-3 font-semibold text-blue-700">Legal</h3>
+              <h3 className="mb-3 font-semibold text-blue-700">
+                {t("footer.legal.title")}
+              </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
                   <a className="hover:underline" href="/privacy">
-                    Privacy
+                    {t("footer.legal.privacy")}
                   </a>
                 </li>
                 <li>
                   <a className="hover:underline" href="/terms">
-                    Terms
+                    {t("footer.legal.terms")}
                   </a>
                 </li>
                 <li>
                   <a className="hover:underline" href="/impressum">
-                    Impressum
+                    {t("footer.legal.impressum")}
                   </a>
                 </li>
               </ul>
             </div>
             <div>
-              <h3 className="mb-3 font-semibold text-blue-700">Quick Links</h3>
+              <h3 className="mb-3 font-semibold text-blue-700">
+                {t("footer.quickLinks.title")}
+              </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
                   <a className="hover:underline" href="/privacy">
-                    Apartments for rent
+                    {t("footer.quickLinks.apartmentsForRent")}
                   </a>
                 </li>
                 <li>
                   <a className="hover:underline" href="/terms">
-                    Villas for sale
+                    {t("footer.quickLinks.villasForRent")}
                   </a>
                 </li>
                 <li>
                   <a className="hover:underline" href="/impressum">
-                    Commercial properties
+                    {t("footer.quickLinks.commercialProperties")}
                   </a>
                 </li>
               </ul>
@@ -187,7 +195,7 @@ const Footer = () => {
         <div className="flex flex-col gap-4 py-6 items-center justify-center">
           {/* Copyright */}
           <p className="text-sm text-gray-500 ">
-            © {year} Egypt Gate. All rights reserved.
+            {t("footer.rightsReserved", { year })} | {t("footer.aqarDot")}
           </p>
         </div>
       </div>

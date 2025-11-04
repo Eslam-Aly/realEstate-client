@@ -9,7 +9,7 @@
     "about": "عنا",
     "signIn": "تسجيل الدخول",
     "langSwitch": "ع",
-    "logoText": "عقارات",
+    "logoText": "عقار دوت",
     "search": "بحث..."
   },
   "createListing": {
@@ -261,6 +261,54 @@
       "error": "فشل تحديث الإعلان",
       "errorGeneric": "حدث خطأ ما",
       "loadError": "فشل تحميل الإعلان"
+    }
+  },
+  "auth": {
+    "signInTitle": "تسجيل الدخول إلى حسابك",
+    "signUpTitle": "إنشاء حساب جديد",
+    "username": "اسم المستخدم",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "noAccount": "لا تملك حسابًا؟ ",
+    "haveAccount": "هل لديك حساب؟ ",
+    "signingIn": "جارٍ تسجيل الدخول...",
+    "signingUp": "جارٍ إنشاء الحساب...",
+    "errorInvalidCredentials": "اسم المستخدم أو كلمة المرور غير صحيحة.",
+    "errorUserExists": "اسم المستخدم أو البريد الإلكتروني مستخدم بالفعل.",
+    "errorPasswordMismatch": "كلمات المرور غير متطابقة.",
+    "errorGeneric": "حدث خطأ ما.",
+    "continueWithGoogle": "المتابعة عبر جوجل"
+  },
+  "footer": {
+    "rightsReserved": "جميع الحقوق محفوظة © {{year}}",
+    "aqarDot": "عقار دوت",
+    "paragraph": "منصتك الموثوقة لشراء وبيع وتأجير العقارات بسهولة وثقة.",
+    "explore": {
+      "title": "استكشف",
+      "buy": "شراء",
+      "rent": "إيجار",
+      "list": "إدراج عقار"
+    },
+    "company": {
+      "title": "الشركه",
+      "about": "معلومات عنا",
+      "careers": "وظائف",
+      "contact": "اتصل بنا"
+    },
+    "legal": {
+      "title": "قانوني",
+      "privacy": "سياسة الخصوصية",
+      "terms": "شروط الخدمة",
+      "impressum": "Impressum"
+    },
+    "quickLinks": {
+      "title": "روابط سريعة",
+      "apartmentsForRent": "شقق ",
+      "villasForRent": "فلل ",
+      "commercialProperties": "عقارات تجارية"
     }
   }
 }

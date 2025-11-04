@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice.js";
 import { useNavigate } from "react-router-dom";
 import API from "../config/api.js";
+import { t } from "i18next";
+import { FcGoogle } from "react-icons/fc";
 
 function OAuth() {
   const navigate = useNavigate();
@@ -41,7 +43,7 @@ function OAuth() {
       onClick={handleGoogleClick}
       className="border p-3 rounded-lg w-full flex justify-center items-center gap-3 hover:shadow-md transition-shadow duration-150 ease-in-out cursor-pointer"
     >
-      Continue with Google
+      {t("auth.continueWithGoogle")} <FcGoogle className="size-8" />
     </button>
   );
 }

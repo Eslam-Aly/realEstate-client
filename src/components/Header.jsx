@@ -35,7 +35,7 @@ function Header() {
   return (
     <header
       dir="ltr"
-      className="bg-blue-700 text-white  w-full  shadow-md h-20 flex items-center sticky top-0 z-50"
+      className="bg-blue-700 text-white  w-full  shadow-md h-16 md:h-20 flex items-center sticky top-0 z-50"
     >
       <div className="container mx-auto flex items-center justify-between w-[90%] ">
         <div>

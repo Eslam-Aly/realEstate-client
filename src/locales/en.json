@@ -9,7 +9,7 @@
     "about": "About",
     "signIn": "Sign In",
     "langSwitch": "EN",
-    "logoText": "Aqarat",
+    "logoText": "AqarDot",
     "search": "Search..."
   },
   "createListing": {
@@ -262,6 +262,54 @@
       "error": "Update failed",
       "errorGeneric": "Something went wrong",
       "loadError": "Failed to load listing"
+    }
+  },
+  "auth": {
+    "signInTitle": "Sign In to Your Account",
+    "signUpTitle": "Create a New Account",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account? ",
+    "signingIn": "Signing In...",
+    "signingUp": "Signing Up...",
+    "errorInvalidCredentials": "Invalid username or password.",
+    "errorUserExists": "Username or email already in use.",
+    "errorPasswordMismatch": "Passwords do not match.",
+    "errorGeneric": "Something went wrong.",
+    "continueWithGoogle": "Continue with Google"
+  },
+  "footer": {
+    "rightsReserved": "All rights reserved © {{year}}",
+    "aqarDot": "Aqar Dot",
+    "paragraph": "Your trusted platform for buying, selling, and renting properties with ease and confidence.",
+    "explore": {
+      "title": "Explore",
+      "buy": "Buy",
+      "rent": "Rent",
+      "list": "List a Property"
+    },
+    "company": {
+      "title": "Company",
+      "about": "About Us",
+      "careers": "Careers",
+      "contact": "Contact Us"
+    },
+    "legal": {
+      "title": "Legal",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "impressum": "Impressum"
+    },
+    "quickLinks": {
+      "title": "Quick Links",
+      "apartmentsForRent": "Apartments",
+      "villasForRent": "Villas",
+      "commercialProperties": "Commercial Properties"
     }
   }
 }

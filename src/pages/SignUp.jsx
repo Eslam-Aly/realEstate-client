@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth.jsx";
 import API from "../config/api.js";
+import { t } from "i18next";
 
 function SignUp() {
   const [error, setError] = React.useState(null);
@@ -41,47 +42,51 @@ function SignUp() {
   };
 
   return (
-    <div className="max-w-lg mx-auto mt-16 p-6  rounded-lg shadow-lg">
-      <h1 className="text-3xl text-center font-semibold my-7">Sign Up</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5 ">
-        <input
-          onChange={handleChange}
-          type="text"
-          id="username"
-          placeholder="username"
-          className="border p-3 rounded-lg "
-        />
-        <input
-          onChange={handleChange}
-          type="email"
-          id="email"
-          placeholder="email"
-          className="border p-3 rounded-lg "
-        />
-        <input
-          onChange={handleChange}
-          type="password"
-          id="password"
-          placeholder="password"
-          className="border p-3 rounded-lg "
-        />
-        <button
-          disabled={loading}
-          type="submit"
-          className="bg-blue-800 text-white p-3 rounded-lg font-semibold"
-        >
-          {loading ? "Loading..." : "Sign Up"}
-        </button>
-        <OAuth />
-      </form>
-      <div className="flex gap-2 mt-5">
-        <p>Have an account?</p>
-        <Link to="/signin" className="text-blue-800 font-semibold">
-          {" "}
-          Login
-        </Link>
+    <div className="min-h-screen">
+      <div className="max-w-lg mx-auto mt-16 md:mt-24 p-6 rounded-lg shadow-lg">
+        <h1 className="text-3xl text-center font-semibold my-7">
+          {t("auth.signUpTitle")}
+        </h1>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 ">
+          <input
+            onChange={handleChange}
+            type="text"
+            id="username"
+            placeholder={t("auth.username")}
+            className="border p-3 rounded-lg "
+          />
+          <input
+            onChange={handleChange}
+            type="email"
+            id="email"
+            placeholder={t("auth.email")}
+            className="border p-3 rounded-lg "
+          />
+          <input
+            onChange={handleChange}
+            type="password"
+            id="password"
+            placeholder={t("auth.password")}
+            className="border p-3 rounded-lg "
+          />
+          <button
+            disabled={loading}
+            type="submit"
+            className="bg-blue-800 text-white p-3 rounded-lg font-semibold"
+          >
+            {loading ? t("auth.loading") : t("auth.signUp")}
+          </button>
+          <OAuth />
+        </form>
+        <div className="flex gap-2 mt-5">
+          <p>{t("auth.haveAccount")}</p>
+          <Link to="/signin" className="text-blue-800 font-semibold">
+            {" "}
+            {t("auth.signIn")}
+          </Link>
+        </div>
+        {error && <p className="text-red-600 mt-3">{error}</p>}
       </div>
-      {error && <p className="text-red-600 mt-3">{error}</p>}
     </div>
   );
 }
