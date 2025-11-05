@@ -366,6 +366,18 @@ function Listing() {
     }
   };
 
+  const translateLicenseType = (rawValue) => {
+    const key = String(rawValue || "")
+      .toLowerCase()
+      .trim();
+    if (!key) {
+      return "N/A";
+    }
+    return t(`createListing.options.licenseType.${key}`, {
+      defaultValue: fmtText(rawValue) || "N/A",
+    });
+  };
+
   useEffect(() => {
     const fetchListings = async () => {
       try {
@@ -692,8 +704,9 @@ function Listing() {
                       </li>
                       <li className="text-blue-600">
                         {t("listing.license")}:{" "}
-                        {fmtText(getLicenseType(listing))}
+                        {translateLicenseType(getLicenseType(listing))}
                       </li>
+
                       <li className="text-blue-600">
                         {t("listing.mezzanine")}:{" "}
                         {fmtYesNo(getHasMezz(listing)) === "Yes"
@@ -702,6 +715,7 @@ function Listing() {
                           ? t("listing.no")
                           : "N/A"}
                       </li>
+
                       <li className="text-blue-600">
                         {t("listing.parkingSpots")}:{" "}
                         {fmtNum(getParkingSpots(listing))}
