@@ -42,10 +42,10 @@ function App() {
             element={<UpdateListing />}
           />
           <Route path="/favorites" element={<Favorites />} />
+          <Route path="/createlistingform" element={<CreateListingForm />} />
         </Route>
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/createlistingform" element={<CreateListingForm />} />
       </Routes>
       <Footer />
     </BrowserRouter>
