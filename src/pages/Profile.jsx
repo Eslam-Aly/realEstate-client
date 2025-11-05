@@ -145,6 +145,8 @@ function Profile() {
     }
   };
   const handleDeleteUser = async () => {
+    const ok = window.confirm(t("profile.deleteAccountConfirmation"));
+    if (!ok) return;
     try {
       dispatch(deleteUserStart());
       const res = await fetch(`${API}/user/delete/${currentUser._id}`, {

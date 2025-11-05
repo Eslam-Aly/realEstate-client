@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import ListingItems from "../components/ListingItems.jsx";
 import API from "../config/api.js";
+import { t } from "i18next";
 
 /**
  * Lists the current user's saved listings. Anonymous visitors are redirected
@@ -46,7 +47,7 @@ export default function Favorites() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[50vh] text-slate-500 text-lg">
-        Loading your favorites…
+        <p>{t("favorites.loading")}</p>
       </div>
     );
   }
@@ -54,10 +55,9 @@ export default function Favorites() {
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-600">
-        <h2 className="text-2xl font-semibold mb-2">No Favorites Yet ❤️</h2>
+        <h2 className="text-2xl font-semibold mb-2">{t("favorites.empty")}</h2>
         <p className="text-slate-500 text-center max-w-md">
-          You haven’t added any listings to your favorites yet. Explore listings
-          and click the heart icon to save your favorite ones!
+          {t("favorites.addFavorites")}
         </p>
       </div>
     );
@@ -67,11 +67,8 @@ export default function Favorites() {
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-slate-800">
-          Your Favorite Listings ❤️
+          {t("favorites.title")}
         </h1>
-        <span className="text-slate-500 text-sm">
-          Showing {items.length} {items.length === 1 ? "listing" : "listings"}
-        </span>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ">

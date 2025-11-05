@@ -51,7 +51,7 @@
       "cornerLot": "Corner Lot",
       "floorArea": "Floor Area (sqm)",
       "licenseType": "License Type",
-      "hasMezz": "Mezzanine",
+      "hasMezz": "Storage Area",
       "parkingSpots": "Parking Spots",
       "totalFloors": "Total Floors",
       "totalUnits": "Total Units",
@@ -193,7 +193,7 @@
     },
     "cornerLot": "Corner Lot",
     "license": "License",
-    "mezzanine": "Mezzanine",
+    "mezzanine": "Storage Area",
     "parkingSpots": "Parking Spots",
     "totalFloors": "Total Floors",
     "totalUnits": "Total Units",
@@ -221,7 +221,11 @@
   },
   "favorites": {
     "title": "Your Favorite Listings",
-    "empty": "No favorites yet."
+    "empty": "No favorites yet.",
+    "addFavorites": "You haven’t added any listings to your favorites yet. Explore listings and click the heart icon to save your favorite ones!",
+    "showingListings": "Showing {count} listing",
+    "loading": "Loading your favorites...",
+    "errorLoading": "Error loading favorites."
   },
   "profile": {
     "title": "Profile",

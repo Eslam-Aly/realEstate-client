@@ -682,8 +682,8 @@ function Listing() {
                   return (
                     <>
                       <li className="text-blue-600">
-                        <FaRulerCombined className="inline-block mr-2" />
-                        {t("listing.floorArea")}:{" "}
+                        <FaRulerCombined className="inline-block mx-2" />
+                        {t("listing.size")}:{" "}
                         {fmtNum(getSize(listing), " " + t("listing.sizeUnit"))}
                       </li>
                       <li className="text-blue-600">
