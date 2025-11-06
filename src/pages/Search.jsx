@@ -617,7 +617,7 @@ function Search() {
           <h2 className="text-2xl font-bold">{t("search.searchResults")}</h2>
           <span className="text-slate-500 text-sm">
             {loading
-              ? "Loading…"
+              ? t("search.loading")
               : `${t("search.showing")} ${listings.length} ${
                   listings.length === 1
                     ? t("search.listing")

@@ -512,7 +512,7 @@ export default function CreateListingForm() {
       setImages((prev) => prev.concat(uploaded));
       setImageUploadError("");
     } catch (err) {
-      setImageUploadError(t("createListing.messages.uploadFailed"));
+      setImageUploadError(err.message);
     } finally {
       setUploading(false);
       setUploadProgress(0);
