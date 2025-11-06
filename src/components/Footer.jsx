@@ -18,13 +18,11 @@ const Footer = () => {
           <div className="max-w-md">
             <div className="flex items-center gap-2">
               {/* Logo placeholder (replace with your SVG/Image if available) */}
-              <div
-                className="h-8 w-8 rounded-md bg-black "
-                aria-hidden="true"
+              <img
+                src="logoFooter.png"
+                alt="logo"
+                className="h-8 w-auto object-contain"
               />
-              <span className="text-lg font-semibold tracking-tight text-blue-700">
-                {t("footer.aqarDot")}
-              </span>
             </div>
             <p className="mt-3 text-sm leading-6 text-gray-500">
               {t("footer.paragraph")}

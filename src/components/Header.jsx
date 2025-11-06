@@ -40,7 +40,11 @@ function Header() {
       <div className="container mx-auto flex items-center justify-between w-[90%] ">
         <div>
           <Link to="/" className="text-sm md:text-2xl font-bold cursor-pointer">
-            {t("nav.logoText")}
+            <img
+              src="logoHeader.png"
+              alt="logo"
+              className="h-6 md:h-8 lg:h-10  w-auto object-contain"
+            />
           </Link>
         </div>
         <div className="flex items-center justify-center ">
