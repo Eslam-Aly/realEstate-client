@@ -1,0 +1,12 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "favorites": "المفضلة",
+    "profile": "الملف الشخصي",
+    "about": "عنا",
+    "signIn": "تسجيل الدخول",
+    "langSwitch": "ع",
+    "logoText": "عقار دوت",
+    "search": "بحث..."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "title": "About AqarDot.com",
+  "tagline": "We’re redefining how Egyptians find their next home.",
+  "intro": "AqarDot.com is a modern real-estate platform built for Egypt. We make it simple to discover, list, and compare properties with trustworthy details and a smooth experience.",
+  "missionTitle": "Our Mission",
+  "missionBody": "Give everyone in Egypt a fast, fair, and transparent way to rent, buy, or sell property — from cozy studios to family villas — all in one place.",
+  "valuesTitle": "What We Value",
+  "values": [
+    {
+      "name": "Trust",
+      "desc": "Verified listings, clear information, and honest communication."
+    },
+    {
+      "name": "Simplicity",
+      "desc": "Fast search, clean design, and fewer clicks to your dream home."
+    },
+    {
+      "name": "Access",
+      "desc": "Serving all governorates — not just the big cities."
+    }
+  ],
+  "howItWorksTitle": "How It Works",
+  "howItWorks": [
+    "Search by governorate, city, and neighborhood with smart filters.",
+    "Compare photos, prices, sizes, and key amenities at a glance.",
+    "Message owners and agents safely through our platform."
+  ],
+  "ctaTitle": "Building With the Community",
+  "ctaBody": "We’re launching new features with your feedback. Tell us what you want to see next!",
+  "contactButton": "Contact Us"
+}

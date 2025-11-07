@@ -1,0 +1,29 @@
+{
+  "title": "Careers at AqarDot.com",
+  "hero": "Join us in building Egypt’s most loved real-estate platform.",
+  "intro": "We’re a small, product-obsessed team shipping fast and learning from real users.",
+  "valuesTitle": "What it’s like here",
+  "values": [
+    {
+      "name": "User First",
+      "desc": "We talk to users weekly and ship what matters."
+    },
+    {
+      "name": "Ownership",
+      "desc": "You’ll shape product, process, and culture."
+    },
+    {
+      "name": "Bias to Action",
+      "desc": "Small teams, big impact, rapid iterations."
+    }
+  ],
+  "openingsTitle": "Open Roles",
+  "noOpenings": "No open roles right now. Send your resume to {{careersEmail}} and we’ll reach out when something fits.",
+  "perksTitle": "Perks (as we grow)",
+  "perks": [
+    "Remote-friendly culture in Egypt",
+    "Impact from day one",
+    "Ownership and learning budget (planned)"
+  ],
+  "cta": "Tell us why you’d love to work on AqarDot.com"
+}

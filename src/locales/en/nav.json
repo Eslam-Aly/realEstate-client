@@ -1,0 +1,12 @@
+{
+  "nav": {
+    "home": "Home",
+    "favorites": "Favorites",
+    "profile": "Profile",
+    "about": "About",
+    "signIn": "Sign In",
+    "langSwitch": "EN",
+    "logoText": "AqarDot",
+    "search": "Search..."
+  }
+}

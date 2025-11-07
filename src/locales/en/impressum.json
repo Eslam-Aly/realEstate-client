@@ -1,0 +1,13 @@
+{
+  "title": "Impressum",
+  "note": "This page provides legal contact information for AqarDot.com.",
+  "legalName": "{{legalName}}",
+  "streetAddress": "{{streetAddress}}",
+  "cityPostal": "{{cityPostal}}",
+  "country": "Egypt",
+  "email": "{{legalEmail}}",
+  "phone": "{{phoneOptional}}",
+  "responsiblePerson": "{{responsiblePerson}}",
+  "disclaimerTitle": "Disclaimer",
+  "disclaimerBody": "Despite careful content control, we assume no liability for external links. The operators of linked pages are solely responsible for their content."
+}

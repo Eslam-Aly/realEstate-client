@@ -1,0 +1,86 @@
+{
+  "createListing": {
+    "title": "إنشاء إعلان",
+    "purpose": {
+      "rent": "إيجار",
+      "sale": "بيع"
+    },
+    "form": {
+      "purposeLabel": "الغاية",
+      "categoryLabel": "نوع العقار",
+      "governorateLabel": "المحافظة",
+      "cityLabel": "المدينة / المنطقة",
+      "selectGovernorate": "اختر المحافظة",
+      "selectGovernorateFirst": "اختر المحافظة أولاً",
+      "selectCity": "اختر المدينة",
+      "otherAreaLabel": "حدد المنطقة (اختياري)",
+      "otherAreaPlaceholder": "مثال: بالقرب من الطريق الدائري، أبو رواش",
+      "selectOption": "اختر {{field}}",
+      "phoneLabel": "رقم الهاتف",
+      "allowWhatsapp": "تفعيل واتساب"
+    },
+    "fields": {
+      "title": "العنوان",
+      "address": "العنوان",
+      "description": "الوصف",
+      "descriptionPlaceholder": "صف العقار، المعالم القريبة، الشروط، وغيرها.",
+      "price": "السعر",
+      "size": "المساحة (م²)",
+      "negotiable": "قابل للتفاوض",
+      "bedrooms": "عدد غرف النوم",
+      "bathrooms": "عدد الحمامات",
+      "floor": "الطابق",
+      "furnished": "مفروش",
+      "parking": "موقف سيارات",
+      "plotArea": "مساحة الأرض (م²)",
+      "frontage": "عرض الواجهة (م)",
+      "zoning": "التصنيف",
+      "cornerLot": "زاوية",
+      "floorArea": "المساحة الداخلية (م²)",
+      "licenseType": "نوع الترخيص",
+      "hasMezz": "مساحة تخزين",
+      "parkingSpots": "عدد أماكن الركن",
+      "totalFloors": "إجمالي الطوابق",
+      "totalUnits": "إجمالي الوحدات",
+      "elevator": "مصعد",
+      "landArea": "مساحة الأرض (م²)",
+      "buildYear": "سنة البناء"
+    },
+    "options": {
+      "zoning": {
+        "residential": "سكني",
+        "commercial": "تجاري",
+        "agricultural": "زراعي",
+        "industrial": "صناعي"
+      },
+      "licenseType": {
+        "retail": "تجزئة",
+        "office": "مكتب",
+        "restaurant": "مطعم",
+        "warehouse": "مخزن",
+        "clinic": "عيادة",
+        "other": "أخرى"
+      }
+    },
+    "messages": {
+      "fieldRequired": "{{field}} مطلوب",
+      "govRequired": "يجب اختيار المحافظة",
+      "cityRequired": "يجب اختيار المدينة / المنطقة",
+      "success": "تم إنشاء الإعلان بنجاح",
+      "errorGeneric": "حدث خطأ ما",
+      "uploadSelectOne": "يرجى اختيار صورة واحدة على الأقل للتحميل",
+      "uploadMaxPerBatch": "يمكنك اختيار {{max}} صور كحد أقصى في المرة الواحدة",
+      "uploadRemaining": "يمكنك التحميل {{remaining}} صورة إضافية فقط. لديك بالفعل {{current}} صورة",
+      "uploadFailed": "فشل تحميل الصور (الحد الأقصى 2 ميجابايت لكل صورة)",
+      "noImages": "لم يتم اختيار صور — سيتم استخدام صورة افتراضية.",
+      "uploadProgress": "{{progress}}٪ تم تحميلها",
+      "errorCreate": "فشل إنشاء الإعلان"
+    },
+    "actions": {
+      "upload": "التحميل",
+      "uploading": "جاري التحميل...",
+      "creating": "جاري الإنشاء...",
+      "submit": "إنشاء الإعلان"
+    }
+  }
+}

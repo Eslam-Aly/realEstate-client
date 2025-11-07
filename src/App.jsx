@@ -1,13 +1,14 @@
 import "./index.css";
+import PrivateRoute from "./components/PrivateRoute.jsx";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import Home from "./pages/Home.jsx";
-
+import AboutPage from "./pages/About.jsx";
 import Profile from "./pages/Profile.jsx";
 import SignIn from "./pages/SignIn.jsx";
 import SignUp from "./pages/SignUp.jsx";
-import PrivateRoute from "./components/PrivateRoute.jsx";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header.jsx";
-
 import UpdateListing from "./pages/UpdateListing.jsx";
 import Listing from "./pages/Listing.jsx";
 import Search from "./pages/Search.jsx";
@@ -15,8 +16,11 @@ import CreateListingForm from "./pages/CreateListingForm.jsx";
 import Footer from "./components/Footer.jsx";
 import AppBoot from "./components/AppBoot.jsx";
 import Favorites from "./pages/Favorites.jsx";
-import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import CareersPage from "./pages/Careers.jsx";
+import ContactPage from "./pages/Contact.jsx";
+import PrivacyPage from "./pages/Privacy.jsx";
+import TermsPage from "./pages/Terms.jsx";
+import ImpressumPage from "./pages/Impressum.jsx";
 
 function App() {
   const { i18n } = useTranslation();
@@ -32,7 +36,6 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
-
         <Route path="/listing/:createdId" element={<Listing />} />
         <Route path="/search" element={<Search />} />
         <Route element={<PrivateRoute />}>
@@ -46,6 +49,12 @@ function App() {
         </Route>
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/careers" element={<CareersPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/impressum" element={<ImpressumPage />} />
       </Routes>
       <Footer />
     </BrowserRouter>

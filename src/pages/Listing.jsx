@@ -30,7 +30,7 @@ import {
   FaPhone,
   FaRulerCombined,
 } from "react-icons/fa";
-import { LuMessageCircleMore } from "react-icons/lu";
+
 import { useTranslation } from "react-i18next";
 import API from "../config/api.js";
 function Listing() {

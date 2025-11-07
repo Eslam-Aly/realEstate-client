@@ -1,0 +1,31 @@
+{
+  "profile": {
+    "title": "Profile",
+    "updateProfile": "Update Profile",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "memberSince": "Member since",
+    "update": "Update Profile",
+    "updating": "Updating...",
+    "updateSuccess": "Profile updated successfully.",
+    "updateError": "Error updating profile.",
+    "deleteAccount": "Delete Account",
+    "deleteAccountConfirmation": "Are you sure you want to delete your account?",
+    "accountDeleted": "Your account has been deleted.",
+    "deleteError": "Error deleting account.",
+    "signOut": "Sign Out",
+    "createListing": "Create Listing",
+    "seeAll": "See all",
+    "favorites": "Favorites",
+    "noFavorites": "You have no favorites yet.",
+    "yourListings": "Your Listings",
+    "noListings": "You have not created any listings yet.",
+    "errorFetchingListings": "Error fetching your listings.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDeleteListing": "Are you sure you want to delete this listing?",
+    "listingDeleted": "Listing deleted successfully.",
+    "errorDeletingListing": "Error deleting listing."
+  }
+}

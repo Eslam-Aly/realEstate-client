@@ -1,0 +1,45 @@
+{
+  "title": "Terms of Service",
+  "lastUpdated": "{{lastUpdated}}",
+  "intro": "Welcome to AqarDot.com. By using our website or apps, you agree to these Terms.",
+  "use": {
+    "title": "Using AqarDot.com",
+    "items": [
+      "You must be at least 18 or have guardian permission.",
+      "Provide accurate information and comply with applicable Egyptian laws.",
+      "You’re responsible for your account and activity."
+    ]
+  },
+  "listings": {
+    "title": "Listings & content",
+    "items": [
+      "You must own the rights to photos and text you upload.",
+      "No misleading prices, fake locations, or prohibited content.",
+      "We may moderate, remove, or limit content that violates these Terms."
+    ]
+  },
+  "payments": {
+    "title": "Payments (if any)",
+    "body": "If we offer paid services later, you agree to pay listed fees and applicable taxes. Refund terms will be specified where relevant."
+  },
+  "disclaimer": {
+    "title": "Disclaimer",
+    "body": "We provide a platform to connect users. We do not own, manage, or guarantee any properties. Transactions happen directly between users."
+  },
+  "liability": {
+    "title": "Limitation of liability",
+    "body": "To the extent permitted by law, we are not liable for lost profits, data, or any indirect or consequential damages arising from your use of the platform."
+  },
+  "termination": {
+    "title": "Termination",
+    "body": "We may suspend or terminate accounts that violate these Terms or harm other users."
+  },
+  "changes": {
+    "title": "Changes to Terms",
+    "body": "We may update these Terms. If changes are material, we’ll notify you by reasonable means. Continued use means you accept the changes."
+  },
+  "contact": {
+    "title": "Contact",
+    "body": "Questions about these Terms? Email {{legalEmail}}."
+  }
+}

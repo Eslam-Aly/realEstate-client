@@ -1,0 +1,86 @@
+{
+  "createListing": {
+    "title": "Create Listing",
+    "purpose": {
+      "rent": "Rent",
+      "sale": "Sale"
+    },
+    "form": {
+      "purposeLabel": "Purpose",
+      "categoryLabel": "Property Type",
+      "governorateLabel": "Governorate",
+      "cityLabel": "City / Area",
+      "selectGovernorate": "Select Governorate",
+      "selectGovernorateFirst": "Select governorate first",
+      "selectCity": "Select City",
+      "otherAreaLabel": "Specify Area (optional)",
+      "otherAreaPlaceholder": "e.g., Near Ring Road, Abu Rawash",
+      "selectOption": "Select {{field}}",
+      "phoneLabel": "Phone Number",
+      "allowWhatsapp": "Enable WhatsApp"
+    },
+    "fields": {
+      "title": "Title",
+      "address": "Address",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the property, nearby landmarks, terms, etc.",
+      "price": "Price",
+      "size": "Size (sqm)",
+      "negotiable": "Negotiable",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "floor": "Floor",
+      "furnished": "Furnished",
+      "parking": "Parking",
+      "plotArea": "Plot Area (sqm)",
+      "frontage": "Frontage (m)",
+      "zoning": "Zoning",
+      "cornerLot": "Corner Lot",
+      "floorArea": "Floor Area (sqm)",
+      "licenseType": "License Type",
+      "hasMezz": "Storage Area",
+      "parkingSpots": "Parking Spots",
+      "totalFloors": "Total Floors",
+      "totalUnits": "Total Units",
+      "elevator": "Elevator",
+      "landArea": "Land Area (sqm)",
+      "buildYear": "Build Year"
+    },
+    "options": {
+      "zoning": {
+        "residential": "Residential",
+        "commercial": "Commercial",
+        "agricultural": "Agricultural",
+        "industrial": "Industrial"
+      },
+      "licenseType": {
+        "retail": "Retail",
+        "office": "Office",
+        "restaurant": "Restaurant",
+        "warehouse": "Warehouse",
+        "clinic": "Clinic",
+        "other": "Other"
+      }
+    },
+    "messages": {
+      "fieldRequired": "{{field}} is required",
+      "govRequired": "Governorate is required",
+      "cityRequired": "City/Area is required",
+      "success": "Listing created successfully",
+      "errorGeneric": "Something went wrong",
+      "uploadSelectOne": "Please select at least one image to upload",
+      "uploadMaxPerBatch": "You can only select up to {{max}} images at once",
+      "uploadRemaining": "You can only upload {{remaining}} more image(s). You already have {{current}} image(s)",
+      "uploadFailed": "Image upload failed (2 MB max per image)",
+      "noImages": "No images selected — a default image will be used.",
+      "uploadProgress": "{{progress}}% uploaded",
+      "errorCreate": "Failed to create listing"
+    },
+    "actions": {
+      "upload": "Upload",
+      "uploading": "Uploading...",
+      "creating": "Creating…",
+      "submit": "Create Listing"
+    }
+  }
+}

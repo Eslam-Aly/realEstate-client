@@ -1,0 +1,64 @@
+{
+  "title": "Privacy Policy",
+  "lastUpdated": "{{lastUpdated}}",
+  "intro": "Your privacy matters. This policy explains what data we collect, why we collect it, and how we handle it in Egypt.",
+  "controller": {
+    "title": "Who controls your data",
+    "body": "AqarDot.com (\"we\", \"us\") acts as the data controller for information processed through our website and apps."
+  },
+  "dataWeCollect": {
+    "title": "Data we collect",
+    "items": [
+      "Account info: name, email, phone (if provided).",
+      "Listing details you publish (photos, prices, addresses you choose to share).",
+      "Usage data: device info, pages viewed, basic analytics.",
+      "Messages you send via our contact forms."
+    ]
+  },
+  "useOfData": {
+    "title": "How we use data",
+    "items": [
+      "Provide and improve our services and features.",
+      "Show relevant property results and prevent fraud.",
+      "Communicate about your account, listings, or support requests.",
+      "Legal compliance where applicable."
+    ]
+  },
+  "legalBasis": {
+    "title": "Legal basis",
+    "items": [
+      "Your consent (e.g., when you submit forms).",
+      "Contractual necessity (to deliver requested services).",
+      "Legitimate interests (platform security, analytics)."
+    ]
+  },
+  "sharing": {
+    "title": "Sharing",
+    "body": "We do not sell your personal data. We may share limited data with service providers (e.g., hosting, email) under confidentiality obligations, or when required by law."
+  },
+  "retention": {
+    "title": "Retention",
+    "body": "We keep data only as long as needed for the purposes above or as required by applicable law, then delete or anonymize it."
+  },
+  "security": {
+    "title": "Security",
+    "body": "We use reasonable technical and organizational measures to protect data. No method of transmission or storage is 100% secure."
+  },
+  "yourRights": {
+    "title": "Your rights",
+    "items": [
+      "Access, correct, or delete your data.",
+      "Withdraw consent where processing is based on consent.",
+      "Object to certain processing where permitted by law."
+    ],
+    "contact": "To exercise rights, contact us at {{privacyEmail}}."
+  },
+  "international": {
+    "title": "International transfers",
+    "body": "If we use providers outside Egypt, we implement appropriate safeguards to protect your data."
+  },
+  "contact": {
+    "title": "Contact",
+    "body": "Questions about privacy? Email {{privacyEmail}}."
+  }
+}

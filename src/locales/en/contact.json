@@ -1,0 +1,18 @@
+{
+  "title": "Contact Us",
+  "subtitle": "We’d love to hear from you.",
+  "description": "Questions, feedback, or partnership ideas? Send a message — we usually respond quickly.",
+  "emailLabel": "Email",
+  "emailValue": "{{contactEmail}}",
+  "form": {
+    "name": "Your Name",
+    "email": "Your Email",
+    "subject": "Subject",
+    "message": "Message",
+    "submit": "Send",
+    "success": "Thanks! We received your message.",
+    "error": "Something went wrong. Please try again."
+  },
+  "altChannelsTitle": "Other ways to reach us",
+  "altChannels": ["Email: {{contactEmail}}", "Social: @AqarDot (coming soon)"]
+}

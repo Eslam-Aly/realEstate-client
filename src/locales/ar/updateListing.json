@@ -1,0 +1,14 @@
+{
+  "updateListing": {
+    "title": "تعديل الإعلان",
+    "actions": {
+      "submit": "تحديث الإعلان",
+      "updating": "جارٍ التحديث..."
+    },
+    "messages": {
+      "error": "فشل تحديث الإعلان",
+      "errorGeneric": "حدث خطأ ما",
+      "loadError": "فشل تحميل الإعلان"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "footer": {
+    "rightsReserved": "All rights reserved © {{year}}",
+    "aqarDot": "Aqar Dot",
+    "paragraph": "Your trusted platform for buying, selling, and renting properties with ease and confidence.",
+    "explore": {
+      "title": "Explore",
+      "buy": "Buy",
+      "rent": "Rent",
+      "list": "List a Property"
+    },
+    "company": {
+      "title": "Company",
+      "about": "About Us",
+      "careers": "Careers",
+      "contact": "Contact Us"
+    },
+    "legal": {
+      "title": "Legal",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "impressum": "Legal Information"
+    },
+    "quickLinks": {
+      "title": "Quick Links",
+      "apartments": "Apartments",
+      "villas": "Villas",
+      "shops": "Shops"
+    }
+  }
+}

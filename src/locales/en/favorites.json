@@ -1,0 +1,10 @@
+{
+  "favorites": {
+    "title": "Your Favorite Listings",
+    "empty": "No favorites yet.",
+    "addFavorites": "You haven’t added any listings to your favorites yet. Explore listings and click the heart icon to save your favorite ones!",
+    "showingListings": "Showing {count} listing",
+    "loading": "Loading your favorites...",
+    "errorLoading": "Error loading favorites."
+  }
+}

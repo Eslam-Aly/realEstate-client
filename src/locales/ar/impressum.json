@@ -1,0 +1,13 @@
+{
+  "title": "المعلومات القانونية",
+  "note": "الصفحة دي بتعرض بيانات التواصل القانونية الخاصة بعقار دوت كوم.",
+  "legalName": "{{legalName}}",
+  "streetAddress": "{{streetAddress}}",
+  "cityPostal": "{{cityPostal}}",
+  "country": "مصر",
+  "email": "{{legalEmail}}",
+  "phone": "{{phoneOptional}}",
+  "responsiblePerson": "{{responsiblePerson}}",
+  "disclaimerTitle": "إخلاء المسؤولية",
+  "disclaimerBody": "بالرغم من مراجعة المحتوى بعناية، لا نتحمّل مسؤولية الروابط الخارجية. مسؤولو المواقع المرتبطة هم المسؤولون عن محتواها."
+}

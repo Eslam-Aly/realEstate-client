@@ -1,0 +1,31 @@
+{
+  "profile": {
+    "title": "الملف الشخصي",
+    "updateProfile": "تحديث الملف الشخصي",
+    "username": "اسم المستخدم",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "memberSince": "عضو منذ",
+    "update": "تحديث الملف الشخصي",
+    "updating": "جارٍ التحديث...",
+    "updateSuccess": "تم تحديث الملف الشخصي بنجاح.",
+    "updateError": "خطأ في تحديث الملف الشخصي.",
+    "deleteAccount": "حذف الحساب",
+    "deleteAccountConfirmation": "هل أنت متأكد أنك تريد حذف حسابك؟",
+    "accountDeleted": "تم حذف حسابك.",
+    "deleteError": "خطأ في حذف الحساب.",
+    "signOut": "تسجيل الخروج",
+    "createListing": "إنشاء إعلان",
+    "seeAll": "عرض الكل",
+    "favorites": "المفضلة",
+    "noFavorites": "لا توجد مفضلات بعد.",
+    "yourListings": "إعلاناتك",
+    "noListings": "لم تقم بإنشاء أي إعلانات بعد.",
+    "errorFetchingListings": "خطأ في جلب إعلاناتك.",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "confirmDeleteListing": "هل أنت متأكد أنك تريد حذف هذا الإعلان؟",
+    "listingDeleted": "تم حذف الإعلان بنجاح.",
+    "errorDeletingListing": "خطأ في حذف الإعلان."
+  }
+}

@@ -123,15 +123,17 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a className="hover:underline">{t("footer.company.about")}</a>
+                  <a className="hover:underline" href="/about">
+                    {t("footer.company.about")}
+                  </a>
                 </li>
                 <li>
-                  <a className="hover:underline">
+                  <a className="hover:underline" href="/contact">
                     {t("footer.company.contact")}
                   </a>
                 </li>
                 <li>
-                  <a className="hover:underline">
+                  <a className="hover:underline" href="/careers">
                     {t("footer.company.careers")}
                   </a>
                 </li>
@@ -143,14 +145,18 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a className="hover:underline">{t("footer.legal.privacy")}</a>
-                </li>
-                <li>
-                  <a className="hover:underline">{t("footer.legal.terms")}</a>
-                </li>
-                <li>
-                  <a className="hover:underline">
+                  <a className="hover:underline" href="/impressum">
                     {t("footer.legal.impressum")}
+                  </a>
+                </li>
+                <li>
+                  <a className="hover:underline" href="/privacy">
+                    {t("footer.legal.privacy")}
+                  </a>
+                </li>
+                <li>
+                  <a className="hover:underline" href="/terms">
+                    {t("footer.legal.terms")}
                   </a>
                 </li>
               </ul>

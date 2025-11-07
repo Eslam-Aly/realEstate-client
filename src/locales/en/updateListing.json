@@ -1,0 +1,14 @@
+{
+  "updateListing": {
+    "title": "Update Listing",
+    "actions": {
+      "submit": "Update Listing",
+      "updating": "Updating…"
+    },
+    "messages": {
+      "error": "Update failed",
+      "errorGeneric": "Something went wrong",
+      "loadError": "Failed to load listing"
+    }
+  }
+}

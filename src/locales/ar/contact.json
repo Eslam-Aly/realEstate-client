@@ -1,0 +1,18 @@
+{
+  "title": "تواصل معنا",
+  "subtitle": "مبسوطين نسمع منك.",
+  "description": "عندك سؤال، اقتراح، أو شراكة؟ ابعت لنا رسالة — غالبًا بنرد بسرعة.",
+  "emailLabel": "البريد الإلكتروني",
+  "emailValue": "{{contactEmail}}",
+  "form": {
+    "name": "اسمك",
+    "email": "بريدك الإلكتروني",
+    "subject": "الموضوع",
+    "message": "الرسالة",
+    "submit": "إرسال",
+    "success": "شكرًا! استلمنا رسالتك.",
+    "error": "حصل خطأ. جرّب تاني."
+  },
+  "altChannelsTitle": "طرق تواصل أخرى",
+  "altChannels": ["البريد: {{contactEmail}}", "السوشيال: @AqarDot (قريبًا)"]
+}
