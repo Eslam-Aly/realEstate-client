@@ -101,17 +101,17 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a className="hover:underline" href="/listings?type=sale">
+                  <a className="hover:underline" href="/search?purpose=sale">
                     {t("footer.explore.buy")}
                   </a>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/listings?type=rent">
+                  <a className="hover:underline" href="/search?purpose=rent">
                     {t("footer.explore.rent")}
                   </a>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/list">
+                  <a className="hover:underline" href="/createlistingform">
                     {t("footer.explore.list")}
                   </a>
                 </li>
@@ -123,17 +123,15 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a className="hover:underline" href="/about">
-                    {t("footer.company.about")}
-                  </a>
+                  <a className="hover:underline">{t("footer.company.about")}</a>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/contact">
+                  <a className="hover:underline">
                     {t("footer.company.contact")}
                   </a>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/careers">
+                  <a className="hover:underline">
                     {t("footer.company.careers")}
                   </a>
                 </li>
@@ -145,17 +143,13 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a className="hover:underline" href="/privacy">
-                    {t("footer.legal.privacy")}
-                  </a>
+                  <a className="hover:underline">{t("footer.legal.privacy")}</a>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/terms">
-                    {t("footer.legal.terms")}
-                  </a>
+                  <a className="hover:underline">{t("footer.legal.terms")}</a>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/impressum">
+                  <a className="hover:underline">
                     {t("footer.legal.impressum")}
                   </a>
                 </li>
@@ -167,18 +161,21 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a className="hover:underline" href="/privacy">
-                    {t("footer.quickLinks.apartmentsForRent")}
+                  <a
+                    className="hover:underline"
+                    href="/search?category=apartment"
+                  >
+                    {t("footer.quickLinks.apartments")}
                   </a>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/terms">
-                    {t("footer.quickLinks.villasForRent")}
+                  <a className="hover:underline" href="/search?category=villa">
+                    {t("footer.quickLinks.villas")}
                   </a>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/impressum">
-                    {t("footer.quickLinks.commercialProperties")}
+                  <a className="hover:underline" href="/search?category=shop">
+                    {t("footer.quickLinks.shops")}
                   </a>
                 </li>
               </ul>

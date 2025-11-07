@@ -293,6 +293,41 @@ function Listing() {
       }
     }
   };
+
+  const handleShare = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      const shareData = {
+        title: listing?.title || "Listing",
+        text: getDisplayAddress(listing) || "",
+        url: typeof window !== "undefined" ? window.location.href : "",
+      };
+
+      if (navigator.share) {
+        await navigator.share(shareData); // Native share panel
+      } else {
+        // Fallback: copy URL
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(shareData.url);
+        }
+        alert("Link copied");
+      }
+    } catch (err) {
+      // If user cancels or share throws, try copy as a fallback
+      try {
+        const url = typeof window !== "undefined" ? window.location.href : "";
+        if (navigator.clipboard?.writeText && url) {
+          await navigator.clipboard.writeText(url);
+          alert("Link copied");
+        }
+      } catch {
+        /* no-op */
+      }
+    }
+  };
+
   const handleDelete = async () => {
     if (!listing?._id) return;
     const ok = window.confirm("Delete this listing?");
@@ -474,8 +509,12 @@ function Listing() {
                   />
                 </button>
                 <button
+                  onClick={handleShare}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
                   className="bg-white bg-opacity-80 hover:bg-opacity-100 p-3 rounded-full shadow-md transition cursor-pointer"
-                  title="Share"
+                  title={t ? t("listing.share") : "Share"}
+                  aria-label={t ? t("listing.share") : "Share"}
                 >
                   <FaShare className="text-blue-600 size-5" />
                 </button>

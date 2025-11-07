@@ -310,9 +310,9 @@
     },
     "quickLinks": {
       "title": "روابط سريعة",
-      "apartmentsForRent": "شقق ",
-      "villasForRent": "فلل ",
-      "commercialProperties": "عقارات تجارية"
+      "apartments": "شقق ",
+      "villas": "فلل ",
+      "shops": "محلات"
     }
   }
 }

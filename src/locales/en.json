@@ -311,9 +311,9 @@
     },
     "quickLinks": {
       "title": "Quick Links",
-      "apartmentsForRent": "Apartments",
-      "villasForRent": "Villas",
-      "commercialProperties": "Commercial Properties"
+      "apartments": "Apartments",
+      "villas": "Villas",
+      "shops": "Shops"
     }
   }
 }
