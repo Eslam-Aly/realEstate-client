@@ -916,7 +916,31 @@ function Listing() {
                 )}
               </ul>
             )
-          ) : null}
+          ) : (
+            // Non-user view: interaction icons
+            <ul className="flex gap-2">
+              {phone && (
+                <li>
+                  <a
+                    className="btn bg-blue-700 text-white hover:bg-blue-800 rounded-lg cursor-pointer py-4 px-6 transition"
+                    href="/signin"
+                  >
+                    {t("listing.callSeller")}
+                  </a>
+                </li>
+              )}
+              {waEnabled && phone && (
+                <li>
+                  <a
+                    className="btn rounded-lg bg-green-600 text-white hover:bg-green-700 px-6 py-4 transition"
+                    href="/signin"
+                  >
+                    {t("listing.contactWhatsApp")}
+                  </a>
+                </li>
+              )}
+            </ul>
+          )}
 
           {/* Similar Listings */}
           <section className="mt-12">
