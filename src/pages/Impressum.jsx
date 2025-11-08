@@ -6,35 +6,41 @@ export default function ImpressumPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
-      <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-blue-700">
+        {t("title")}
+      </h1>
+      <p className="mt-2 text-gray-500">{t("note")}</p>
 
       <div className="mt-6 rounded-2xl border bg-white p-5 shadow-sm text-gray-900">
         <Row
-          label="Legal Name"
+          label={t("legalNameLabel")}
           value={t("legalName", { legalName: "Eslam Aly" })}
         />
         <Row
-          label="Address"
+          label={t("streetAddressLabel")}
           value={t("streetAddress", { streetAddress: "—" })}
         />
         <Row
-          label="City / Postal"
+          label={t("cityPostalLabel")}
           value={t("cityPostal", { cityPostal: "—" })}
         />
-        <Row label="Country" value={t("country")} />
+        <Row label={t("countryLabel")} value={t("country")} />
         <Row
-          label="Email"
+          label={t("emailLabel")}
           value={t("email", { legalEmail: "legal@aqardot.com" })}
         />
-        <Row label="Phone" value={t("phone", { phoneOptional: "—" })} />
         <Row
-          label="Responsible"
-          value={t("responsiblePerson", { responsiblePerson: "Eslam Aly" })}
+          label={t("phoneLabel")}
+          value={t("phone", { phoneOptional: "—" })}
+        />
+        <Row
+          label={t("responsiblePersonLabel")}
+          value={t("responsiblePerson")}
         />
       </div>
 
       <div className="prose prose-gray max-w-none mt-6">
-        <h2>{t("disclaimerTitle")}</h2>
+        <h2 className="font-semibold">{t("disclaimerTitle")}</h2>
         <p>{t("disclaimerBody")}</p>
       </div>
     </div>

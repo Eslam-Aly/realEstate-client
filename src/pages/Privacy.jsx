@@ -10,64 +10,74 @@ export default function PrivacyPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
-      <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
-      <p className="mt-2 text-sm text-gray-500">
+      <h1 className="text-3xl font-bold tracking-tight text-blue-700">
+        {t("title")}
+      </h1>
+      <p className="mt-2 text-sm text-gray-400">
         {t("lastUpdated", {
           lastUpdated: new Date().toISOString().slice(0, 10),
         })}
       </p>
 
-      <div className="prose prose-gray max-w-none mt-6">
+      <div className="flex flex-col gap-4 prose prose-gray max-w-none mt-6">
         <p>{t("intro")}</p>
-
-        <h2>{t("controller.title")}</h2>
-        <p>{t("controller.body")}</p>
-
-        <h2>{t("dataWeCollect.title")}</h2>
-        <ul>
-          {dataWeCollect.map((i, idx) => (
-            <li key={idx}>{i}</li>
-          ))}
-        </ul>
-
-        <h2>{t("useOfData.title")}</h2>
-        <ul>
-          {useOfData.map((i, idx) => (
-            <li key={idx}>{i}</li>
-          ))}
-        </ul>
-
-        <h2>{t("legalBasis.title")}</h2>
-        <ul>
-          {legalBasis.map((i, idx) => (
-            <li key={idx}>{i}</li>
-          ))}
-        </ul>
-
-        <h2>{t("sharing.title")}</h2>
-        <p>{t("sharing.body")}</p>
-
-        <h2>{t("retention.title")}</h2>
-        <p>{t("retention.body")}</p>
-
-        <h2>{t("security.title")}</h2>
-        <p>{t("security.body")}</p>
-
-        <h2>{t("yourRights.title")}</h2>
-        <ul>
-          {yourRights.map((i, idx) => (
-            <li key={idx}>{i}</li>
-          ))}
-        </ul>
-        <p className="text-sm text-gray-600">
-          {t("yourRights.contact", { privacyEmail: "privacy@aqardot.com" })}
-        </p>
-
-        <h2>{t("international.title")}</h2>
-        <p>{t("international.body")}</p>
-
-        <h2>{t("contact.title")}</h2>
-        <p>{t("contact.body", { privacyEmail: "privacy@aqardot.com" })}</p>
+        <div>
+          <h2 className="text-lg font-bold">{t("controller.title")}</h2>
+          <p>{t("controller.body")}</p>
+        </div>
+        <div>
+          <h2 className="text-lg font-bold">{t("dataWeCollect.title")}</h2>
+          <ul>
+            {dataWeCollect.map((i, idx) => (
+              <li key={idx}>{i}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h2 className="text-lg font-bold">{t("useOfData.title")}</h2>
+          <ul>
+            {useOfData.map((i, idx) => (
+              <li key={idx}>{i}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h2 className="text-lg font-bold">{t("legalBasis.title")}</h2>
+          <ul>
+            {legalBasis.map((i, idx) => (
+              <li key={idx}>{i}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h2 className="text-lg font-bold">{t("sharing.title")}</h2>
+          <p>{t("sharing.body")}</p>
+        </div>
+        <div>
+          <h2 className="text-lg font-bold">{t("retention.title")}</h2>
+          <p>{t("retention.body")}</p>
+        </div>
+        <div>
+          <h2 className="text-lg font-bold">{t("security.title")}</h2>
+          <p>{t("security.body")}</p>
+        </div>
+        <div>
+          <h2 className="text-lg font-bold">{t("yourRights.title")}</h2>
+          <ul>
+            {yourRights.map((i, idx) => (
+              <li key={idx}>{i}</li>
+            ))}
+          </ul>
+        </div>
+        <p className="text-sm text-gray-600">{t("yourRights.contact")}</p>
+        <div>
+          <h2 className="text-lg font-bold">{t("international.title")}</h2>
+          <p>{t("international.body")}</p>
+        </div>
+        <div>
+          <h2 className="text-lg font-bold">{t("contact.title")}</h2>
+          <p>{t("contact.body")}</p>
+        </div>
       </div>
     </div>
   );

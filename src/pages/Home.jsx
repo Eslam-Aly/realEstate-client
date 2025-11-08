@@ -158,7 +158,7 @@ function Home() {
 
         {/* Content (top-left) */}
         <div className="mx-auto max-w-7xl px-5 pt-16 md:px-10 md:pt-24">
-          <h1 className="max-w-xl text-4xl font-extrabold leading-tight tracking-tight text-white drop-shadow md:text-6xl my-12">
+          <h1 className="max-w-xl text-4xl font-extrabold leading-tight tracking-tight text-gray-100 drop-shadow md:text-6xl my-12">
             {t("search.title")}
           </h1>
 

@@ -4,7 +4,7 @@
   "intro": "Your privacy matters. This policy explains what data we collect, why we collect it, and how we handle it in Egypt.",
   "controller": {
     "title": "Who controls your data",
-    "body": "AqarDot.com (\"we\", \"us\") acts as the data controller for information processed through our website and apps."
+    "body": "AqarDot.com acts as the data controller for information processed through our website and apps."
   },
   "dataWeCollect": {
     "title": "Data we collect",
@@ -51,7 +51,7 @@
       "Withdraw consent where processing is based on consent.",
       "Object to certain processing where permitted by law."
     ],
-    "contact": "To exercise rights, contact us at {{privacyEmail}}."
+    "contact": "To exercise rights, contact us at contact@aqardot.com."
   },
   "international": {
     "title": "International transfers",
@@ -59,6 +59,6 @@
   },
   "contact": {
     "title": "Contact",
-    "body": "Questions about privacy? Email {{privacyEmail}}."
+    "body": "Questions about privacy? Email contact@aqardot.com."
   }
 }
