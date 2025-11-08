@@ -305,19 +305,11 @@ function Listing() {
         ? window.location.href
         : "https://www.aqardot.com";
 
-    const shareText = [shareTitle, shareMessage, shareAddress]
+    const shareText = [shareTitle, shareMessage, shareAddress, shareUrl]
       .filter(Boolean)
       .join("\n");
-    const clipboardPayload = [shareText, shareUrl]
-      .filter(Boolean)
-      .join("\n")
-      .trim();
-
-    const shareData = {
-      title: shareTitle,
-      text: shareText,
-      url: shareUrl,
-    };
+    const clipboardPayload = shareText.trim();
+    const shareData = { text: shareText };
 
     try {
       if (navigator.share) {
