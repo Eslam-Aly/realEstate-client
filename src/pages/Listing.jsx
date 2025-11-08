@@ -300,27 +300,36 @@ function Listing() {
 
     try {
       const shareData = {
-        title: listing?.title || "Listing",
+        message: t("listing.shareMessage"),
+        img: listing?.images?.[0] || "/placeholder.jpg",
+        title: listing?.title || t("listing.shareMessage"),
         text: getDisplayAddress(listing) || "",
-        url: typeof window !== "undefined" ? window.location.href : "",
+        url:
+          typeof window !== "undefined"
+            ? window.location.href
+            : "www.aqardot.com",
       };
 
       if (navigator.share) {
         await navigator.share(shareData); // Native share panel
+        console.log("Shared successfully: ", shareData);
       } else {
         // Fallback: copy URL
         if (navigator.clipboard?.writeText) {
           await navigator.clipboard.writeText(shareData.url);
         }
-        alert("Link copied");
+        alert(t("listing.copied"));
       }
     } catch (err) {
       // If user cancels or share throws, try copy as a fallback
       try {
-        const url = typeof window !== "undefined" ? window.location.href : "";
+        const url =
+          typeof window !== "undefined"
+            ? window.location.href
+            : "www.aqardot.com";
         if (navigator.clipboard?.writeText && url) {
           await navigator.clipboard.writeText(url);
-          alert("Link copied");
+          alert(t("listing.copied"));
         }
       } catch {
         /* no-op */
