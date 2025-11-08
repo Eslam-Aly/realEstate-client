@@ -27,7 +27,6 @@ import {
   FaMapMarkerAlt,
   FaShare,
   FaHeart,
-  FaPhone,
   FaRulerCombined,
 } from "react-icons/fa";
 
@@ -298,37 +297,64 @@ function Listing() {
     e.preventDefault();
     e.stopPropagation();
 
+    const shareUrl =
+      typeof window !== "undefined"
+        ? window.location.href
+        : "https://www.aqardot.com";
+    const shareTitle = listing?.title || t("listing.shareMessage");
+    const shareText =
+      [t("listing.shareMessage"), getDisplayAddress(listing)]
+        .filter(Boolean)
+        .join("\n") || shareTitle;
+    const copyPayload = `${shareTitle}\n${shareText}\n${shareUrl}`.trim();
+
+    const buildShareData = async () => {
+      const baseData = { title: shareTitle, text: shareText, url: shareUrl };
+
+      const imageSrc = listing?.images?.[0];
+      const canUseFiles =
+        typeof window !== "undefined" &&
+        navigator?.canShare &&
+        typeof File !== "undefined" &&
+        typeof fetch !== "undefined";
+
+      if (!imageSrc || !canUseFiles) return baseData;
+
+      try {
+        const absoluteUrl = imageSrc.startsWith("http")
+          ? imageSrc
+          : new URL(imageSrc, window.location.origin).href;
+        const resp = await fetch(absoluteUrl);
+        if (!resp.ok) throw new Error("Failed to download share image");
+        const blob = await resp.blob();
+        const fileName = absoluteUrl.split("/").pop() || "listing.jpg";
+        const file = new File([blob], fileName, {
+          type: blob.type || "image/jpeg",
+        });
+        const files = [file];
+        if (navigator.canShare({ ...baseData, files })) {
+          return { ...baseData, files };
+        }
+      } catch (imageErr) {
+        console.warn("Share image fallback", imageErr);
+      }
+      return baseData;
+    };
+
     try {
-      const shareData = {
-        message: t("listing.shareMessage"),
-        img: listing?.images?.[0] || "/placeholder.jpg",
-        title: listing?.title || t("listing.shareMessage"),
-        text: getDisplayAddress(listing) || "",
-        url:
-          typeof window !== "undefined"
-            ? window.location.href
-            : "www.aqardot.com",
-      };
+      const shareData = await buildShareData();
 
       if (navigator.share) {
-        await navigator.share(shareData); // Native share panel
+        await navigator.share(shareData);
         console.log("Shared successfully: ", shareData);
-      } else {
-        // Fallback: copy URL
-        if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(shareData.url);
-        }
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(copyPayload);
         alert(t("listing.copied"));
       }
     } catch (err) {
-      // If user cancels or share throws, try copy as a fallback
       try {
-        const url =
-          typeof window !== "undefined"
-            ? window.location.href
-            : "www.aqardot.com";
-        if (navigator.clipboard?.writeText && url) {
-          await navigator.clipboard.writeText(url);
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(copyPayload);
           alert(t("listing.copied"));
         }
       } catch {
