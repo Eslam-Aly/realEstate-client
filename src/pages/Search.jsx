@@ -106,10 +106,10 @@ function Search() {
         const endpoint = searchQuery
           ? `${API}/listings/get?${searchQuery}`
           : `${API}/listings/get`;
-        console.log("Fetching from:", endpoint);
+
         const response = await fetch(endpoint);
         const data = await response.json();
-        console.log("Search results:", data);
+
         // Robust parser: accept array or {results: [...]}
         const list = Array.isArray(data) ? data : data?.results || [];
         setListings(list);

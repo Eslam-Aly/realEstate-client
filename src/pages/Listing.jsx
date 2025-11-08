@@ -314,7 +314,6 @@ function Listing() {
     try {
       if (navigator.share) {
         await navigator.share(shareData);
-        console.log("Shared successfully: ", shareData);
       } else if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(clipboardPayload || shareUrl);
         alert(t("listing.copied"));
@@ -438,7 +437,6 @@ function Listing() {
         fetchSimilar(data);
         fetchOwner(data?.userRef);
         try {
-          console.log("[Listing] payload keys:", Object.keys(data));
         } catch (_) {}
         setLoading(false);
         setError(false);

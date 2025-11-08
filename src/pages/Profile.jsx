@@ -46,7 +46,6 @@ function Profile() {
 
   useEffect(() => {
     if (file) {
-      console.log(file);
       handleFileUpload(file);
     }
   }, [file]);
@@ -100,7 +99,7 @@ function Profile() {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         const percent = Math.round(progress);
-        console.log("Upload is " + percent + "% done");
+
         setUploadProgress(percent);
         setUploadStatus(`Uploading... ${percent}%`);
       },
@@ -185,8 +184,7 @@ function Profile() {
       const res = await fetch(`${API}/user/listings/${currentUser._id}`, {
         credentials: "include",
       });
-      console.log(res);
-      console.log(currentUser._id);
+
       const data = await res.json();
       if (data.success === false) {
         setShowListingsError(true);
