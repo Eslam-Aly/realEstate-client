@@ -297,64 +297,40 @@ function Listing() {
     e.preventDefault();
     e.stopPropagation();
 
+    const shareTitle = listing?.title || t("listing.shareMessage");
+    const shareAddress = getDisplayAddress(listing) || "";
+    const shareMessage = t("listing.shareMessage");
     const shareUrl =
       typeof window !== "undefined"
         ? window.location.href
         : "https://www.aqardot.com";
-    const shareTitle = listing?.title || t("listing.shareMessage");
-    const shareText =
-      [t("listing.shareMessage"), getDisplayAddress(listing)]
-        .filter(Boolean)
-        .join("\n") || shareTitle;
-    const copyPayload = `${shareTitle}\n${shareText}\n${shareUrl}`.trim();
 
-    const buildShareData = async () => {
-      const baseData = { title: shareTitle, text: shareText, url: shareUrl };
+    const shareText = [shareTitle, shareMessage, shareAddress]
+      .filter(Boolean)
+      .join("\n");
+    const clipboardPayload = [shareText, shareUrl]
+      .filter(Boolean)
+      .join("\n")
+      .trim();
 
-      const imageSrc = listing?.images?.[0];
-      const canUseFiles =
-        typeof window !== "undefined" &&
-        navigator?.canShare &&
-        typeof File !== "undefined" &&
-        typeof fetch !== "undefined";
-
-      if (!imageSrc || !canUseFiles) return baseData;
-
-      try {
-        const absoluteUrl = imageSrc.startsWith("http")
-          ? imageSrc
-          : new URL(imageSrc, window.location.origin).href;
-        const resp = await fetch(absoluteUrl);
-        if (!resp.ok) throw new Error("Failed to download share image");
-        const blob = await resp.blob();
-        const fileName = absoluteUrl.split("/").pop() || "listing.jpg";
-        const file = new File([blob], fileName, {
-          type: blob.type || "image/jpeg",
-        });
-        const files = [file];
-        if (navigator.canShare({ ...baseData, files })) {
-          return { ...baseData, files };
-        }
-      } catch (imageErr) {
-        console.warn("Share image fallback", imageErr);
-      }
-      return baseData;
+    const shareData = {
+      title: shareTitle,
+      text: shareText,
+      url: shareUrl,
     };
 
     try {
-      const shareData = await buildShareData();
-
       if (navigator.share) {
         await navigator.share(shareData);
         console.log("Shared successfully: ", shareData);
       } else if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(copyPayload);
+        await navigator.clipboard.writeText(clipboardPayload || shareUrl);
         alert(t("listing.copied"));
       }
     } catch (err) {
       try {
         if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(copyPayload);
+          await navigator.clipboard.writeText(clipboardPayload || shareUrl);
           alert(t("listing.copied"));
         }
       } catch {
