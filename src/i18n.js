@@ -62,6 +62,18 @@ const arModules = [
   arFooter,
 ];
 
+const getInitialLang = () => {
+  if (typeof window === "undefined") return "en";
+  try {
+    const stored = localStorage.getItem("appLang");
+    if (stored) return stored;
+  } catch {
+    /* ignore storage errors */
+  }
+  const browserLang = navigator?.language?.toLowerCase() || "en";
+  return browserLang.startsWith("ar") ? "ar" : "en";
+};
+
 const resources = {
   en: {
     translation: mergeTranslations(enModules, {
@@ -87,8 +99,18 @@ const resources = {
 
 i18n.use(initReactI18next).init({
   resources,
-  lng: "en",
+  lng: getInitialLang(),
   fallbackLng: "en",
   interpolation: { escapeValue: false },
 });
+
+if (typeof window !== "undefined") {
+  i18n.on("languageChanged", (lng) => {
+    try {
+      localStorage.setItem("appLang", lng);
+    } catch {
+      /* ignore storage errors now */
+    }
+  });
+}
 export default i18n;

@@ -1,5 +1,6 @@
 import React from "react";
 import { t } from "i18next";
+import { Link } from "react-router-dom";
 
 // Basic, responsive footer that matches a modern real-estate site layout.
 // Uses Tailwind utility classes and keeps styling neutral so it blends with your
@@ -101,19 +102,19 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a className="hover:underline" href="/search?purpose=sale">
+                  <Link className="hover:underline" to="/search?purpose=sale">
                     {t("footer.explore.buy")}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/search?purpose=rent">
+                  <Link className="hover:underline" to="/search?purpose=rent">
                     {t("footer.explore.rent")}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/createlistingform">
+                  <Link className="hover:underline" to="/createlistingform">
                     {t("footer.explore.list")}
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -123,19 +124,19 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a className="hover:underline" href="/about">
+                  <Link className="hover:underline" to="/about">
                     {t("footer.company.about")}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/contact">
+                  <Link className="hover:underline" to="/contact">
                     {t("footer.company.contact")}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/careers">
+                  <Link className="hover:underline" to="/careers">
                     {t("footer.company.careers")}
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -145,19 +146,19 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a className="hover:underline" href="/impressum">
+                  <Link className="hover:underline" to="/impressum">
                     {t("footer.legal.impressum")}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/privacy">
+                  <Link className="hover:underline" to="/privacy">
                     {t("footer.legal.privacy")}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/terms">
+                  <Link className="hover:underline" to="/terms">
                     {t("footer.legal.terms")}
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -167,22 +168,22 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 text-gray-500">
                 <li>
-                  <a
+                  <Link
                     className="hover:underline"
-                    href="/search?category=apartment"
+                    to="/search?category=apartment"
                   >
                     {t("footer.quickLinks.apartments")}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/search?category=villa">
+                  <Link className="hover:underline" to="/search?category=villa">
                     {t("footer.quickLinks.villas")}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="hover:underline" href="/search?category=shop">
+                  <Link className="hover:underline" to="/search?category=shop">
                     {t("footer.quickLinks.shops")}
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
