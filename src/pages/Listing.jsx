@@ -305,7 +305,7 @@ function Listing() {
         ? window.location.href
         : "https://www.aqardot.com";
 
-    const shareText = [shareTitle, shareMessage, shareAddress, shareUrl]
+    const shareText = [shareMessage, shareTitle, shareAddress, shareUrl]
       .filter(Boolean)
       .join("\n");
     const clipboardPayload = shareText.trim();
