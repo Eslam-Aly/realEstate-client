@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import API from "../config/api.js";
 
 export default function ContactPage() {
   const { t } = useTranslation(undefined, { keyPrefix: "contact" });
@@ -10,14 +11,28 @@ export default function ContactPage() {
     e.preventDefault();
     setLoading(true);
     setStatus(null);
+    const formData = new FormData(e.target);
+    const data = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      subject: formData.get("subject"),
+      message: formData.get("message"),
+    };
+
     try {
-      const formData = new FormData(e.currentTarget);
-      // TODO: replace with your backend endpoint
-      // await fetch("/api/contact", { method: "POST", body: formData });
-      await new Promise((r) => setTimeout(r, 600));
-      setStatus("success");
-      e.currentTarget.reset();
-    } catch {
+      const res = await fetch(`${API}/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (result.success) {
+        setStatus("success");
+        e.target.reset();
+      } else {
+        setStatus("error");
+      }
+    } catch (err) {
       setStatus("error");
     } finally {
       setLoading(false);
