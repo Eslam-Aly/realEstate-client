@@ -16,17 +16,16 @@ function OAuth() {
       const auth = getAuth(app);
 
       const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const idToken = credential.idToken;
+
       const res = await fetch(`${API}/auth/google`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({
-          name: result.user.displayName,
-          email: result.user.email,
-          photo: result.user.photoURL,
-        }),
+        body: JSON.stringify({ idToken }),
       });
       if (!res.ok) throw new Error("Google authentication failed");
 

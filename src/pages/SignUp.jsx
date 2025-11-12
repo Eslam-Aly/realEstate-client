@@ -20,6 +20,7 @@ function SignUp() {
     e.preventDefault();
     try {
       setLoading(true);
+      const appLang = localStorage.getItem("appLang") || "en";
       const res = await fetch(`${API}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -32,9 +33,26 @@ function SignUp() {
         setError(data.message);
         return;
       }
+      // Send verification email immediately after successful signup
+      try {
+        const verifyRes = await fetch(`${API}/auth/send-verification`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email: formData.email, lang: appLang }),
+        });
+        // Best-effort: don't block navigation on errors
+        if (!verifyRes.ok) {
+          const txt = await verifyRes.text();
+          console.warn("send-verification failed:", txt);
+        }
+      } catch (e) {
+        console.warn("send-verification error:", e?.message);
+      }
       setLoading(false);
       setError(null);
-      navigate("/signin");
+      // Optionally pass a flag to signin so it can show a notice
+      navigate("/signin?verify=sent");
     } catch (error) {
       setLoading(false);
       setError(error.message);

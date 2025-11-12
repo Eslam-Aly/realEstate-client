@@ -3,6 +3,8 @@ import PrivateRoute from "./components/PrivateRoute.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
+import { bootstrapAuth } from "./lib/bootstrapAuth";
 import Home from "./pages/Home.jsx";
 import AboutPage from "./pages/About.jsx";
 import Profile from "./pages/Profile.jsx";
@@ -21,9 +23,16 @@ import ContactPage from "./pages/Contact.jsx";
 import PrivacyPage from "./pages/Privacy.jsx";
 import TermsPage from "./pages/Terms.jsx";
 import ImpressumPage from "./pages/Impressum.jsx";
+import Verified from "./pages/Verified.jsx";
+import ResetPasswordPage from "./pages/ResetPassword.jsx";
 
 function App() {
   const { i18n } = useTranslation();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(bootstrapAuth());
+  }, [dispatch]);
 
   useEffect(() => {
     const lang = i18n.language || "en";
@@ -47,6 +56,8 @@ function App() {
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/createlistingform" element={<CreateListingForm />} />
         </Route>
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/verified" element={<Verified />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/about" element={<AboutPage />} />
