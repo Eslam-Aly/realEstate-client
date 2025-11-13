@@ -25,6 +25,7 @@ function SignIn() {
   const [resendTimer, setResendTimer] = React.useState(0);
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith("ar");
+  const [forgotTimer, setForgotTimer] = React.useState(0);
 
   React.useEffect(() => {
     const verify = params.get("verify");
@@ -45,6 +46,14 @@ function SignIn() {
     }, 1000);
     return () => clearInterval(interval);
   }, [resendTimer]);
+
+  React.useEffect(() => {
+    if (!forgotTimer) return undefined;
+    const interval = setInterval(() => {
+      setForgotTimer((prev) => (prev > 1 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [forgotTimer]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -105,6 +114,10 @@ function SignIn() {
 
   const handleForgot = async () => {
     setResetMsg("");
+    if (forgotTimer > 0) {
+      setResetMsg(t("auth.resetCountdown", { seconds: forgotTimer }));
+      return;
+    }
     if (!formData.email) {
       setResetMsg(
         t("auth.enterEmailFirst", "Please enter your email above first.")
@@ -128,6 +141,7 @@ function SignIn() {
           "If the account exists, a password reset link has been sent to your email."
         )
       );
+      setForgotTimer(60);
     } catch (e) {
       setResetMsg(
         t(
@@ -135,6 +149,7 @@ function SignIn() {
           "If the account exists, a password reset link has been sent to your email."
         )
       );
+      setForgotTimer(60);
     }
   };
 
@@ -199,9 +214,16 @@ function SignIn() {
             <button
               type="button"
               onClick={handleForgot}
-              className="text-sm text-blue-800 hover:underline cursor-pointer"
+              className={`text-sm transition ${
+                forgotTimer > 0
+                  ? "text-slate-500 cursor-not-allowed"
+                  : "text-blue-800 hover:underline cursor-pointer"
+              }`}
+              disabled={forgotTimer > 0}
             >
-              {t("auth.forgotPassword", "Forgot password?")}
+              {forgotTimer > 0
+                ? t("auth.resetCountdownShort", { seconds: forgotTimer })
+                : t("auth.forgotPassword", "Forgot password?")}
             </button>
             {canResendVerification && (
               <button
