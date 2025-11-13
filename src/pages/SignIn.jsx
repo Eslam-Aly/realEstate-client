@@ -8,7 +8,8 @@ import {
   signInSuccess,
 } from "../redux/user/userSlice.js";
 import API from "../config/api.js";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
+import { mapApiErrorMessage } from "../utils/mapApiErrorMessage.js";
 
 function SignIn() {
   const dispatch = useDispatch();
@@ -18,6 +19,12 @@ function SignIn() {
   const [params] = useSearchParams();
   const [infoMessage, setInfoMessage] = React.useState("");
   const [resetMsg, setResetMsg] = React.useState("");
+  const [verificationMsg, setVerificationMsg] = React.useState("");
+  const [canResendVerification, setCanResendVerification] =
+    React.useState(false);
+  const [resendTimer, setResendTimer] = React.useState(0);
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language?.startsWith("ar");
 
   React.useEffect(() => {
     const verify = params.get("verify");
@@ -29,13 +36,26 @@ function SignIn() {
         )
       );
     }
-  }, [params]);
+  }, [params, t]);
+
+  React.useEffect(() => {
+    if (!resendTimer) return undefined;
+    const interval = setInterval(() => {
+      setResendTimer((prev) => (prev > 1 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-    });
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+    if (verificationMsg) setVerificationMsg("");
+    if (id === "email") {
+      setCanResendVerification(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -48,20 +68,38 @@ function SignIn() {
         credentials: "include",
         body: JSON.stringify(formData),
       });
+      const data = await res.json().catch(() => null);
       if (!res.ok) {
-        const text = await res.text();
-        dispatch(signInFailure(text || `HTTP ${res.status}`));
+        const apiMessage =
+          data?.message || `HTTP ${res.status}: ${res.statusText}`;
+        setCanResendVerification(
+          apiMessage === "Please verify your email before logging in"
+        );
+        const localized = mapApiErrorMessage(apiMessage, t);
+        dispatch(signInFailure(localized || apiMessage));
         return;
       }
-      const data = await res.json();
+      if (!data) {
+        dispatch(signInFailure(t("auth.errorGeneric")));
+        return;
+      }
       if (data.success === false) {
-        dispatch(signInFailure(data.message));
+        setCanResendVerification(
+          data.message === "Please verify your email before logging in"
+        );
+        const localized = mapApiErrorMessage(data.message, t);
+        dispatch(signInFailure(localized || data.message));
         return;
       }
+      setCanResendVerification(false);
       dispatch(signInSuccess(data));
       navigate("/");
     } catch (error) {
-      dispatch(signInFailure(error.message));
+      setCanResendVerification(false);
+      const localized = mapApiErrorMessage(error.message, t);
+      dispatch(
+        signInFailure(localized || error.message || t("auth.errorGeneric"))
+      );
     }
   };
 
@@ -100,8 +138,39 @@ function SignIn() {
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!formData.email) {
+      setVerificationMsg(t("auth.enterEmailFirst"));
+      return;
+    }
+    if (resendTimer > 0) {
+      setVerificationMsg(
+        t("auth.resendVerificationCountdown", { seconds: resendTimer })
+      );
+      return;
+    }
+    try {
+      setVerificationMsg(t("auth.sendingVerification"));
+      const appLang = localStorage.getItem("appLang") || "en";
+      const res = await fetch(`${API}/auth/send-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email, lang: appLang }),
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        console.warn("send-verification failed:", txt);
+      }
+      setResendTimer(60);
+      setVerificationMsg(t("auth.resendVerificationSent"));
+    } catch (e) {
+      console.warn("send-verification error:", e?.message);
+      setVerificationMsg(t("auth.errorGeneric"));
+    }
+  };
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" dir={isAr ? "rtl" : "ltr"}>
       <div className="max-w-lg mx-auto mt-16 p-6 md:mt-24 rounded-lg shadow-lg">
         <h1 className="text-3xl text-center font-semibold my-7">
           {t("auth.signInTitle")}
@@ -126,14 +195,32 @@ function SignIn() {
             placeholder={t("auth.password")}
             className="border p-3 rounded-lg "
           />
-          <div className="-mt-2">
+          <div className="-mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <button
               type="button"
               onClick={handleForgot}
-              className="text-sm text-blue-800 hover:underline"
+              className="text-sm text-blue-800 hover:underline cursor-pointer"
             >
               {t("auth.forgotPassword", "Forgot password?")}
             </button>
+            {canResendVerification && (
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                className={`text-sm font-medium transition cursor-pointer ${
+                  resendTimer > 0
+                    ? "text-slate-500 cursor-not-allowed"
+                    : "text-blue-800 hover:underline"
+                }`}
+                disabled={resendTimer > 0}
+              >
+                {resendTimer > 0
+                  ? t("auth.resendVerificationCountdown", {
+                      seconds: resendTimer,
+                    })
+                  : t("auth.resendVerification")}
+              </button>
+            )}
           </div>
           <button
             disabled={loading}
@@ -145,6 +232,9 @@ function SignIn() {
           <OAuth />
         </form>
         {resetMsg && <p className="mt-4 text-sm text-gray-700">{resetMsg}</p>}
+        {verificationMsg && (
+          <p className="mt-2 text-sm text-blue-800">{verificationMsg}</p>
+        )}
         <div className="flex gap-2 mt-5">
           <p>{t("auth.noAccount")}</p>
           <Link to="/signup" className="text-blue-800 font-semibold">

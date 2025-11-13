@@ -293,12 +293,12 @@ function Profile() {
         <button
           disabled={loading}
           type="submit"
-          className="bg-blue-800 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer disabled:opacity-80"
+          className="bg-blue-700 text-white p-3 rounded-lg font-semibold hover:bg-blue-800 transition cursor-pointer disabled:opacity-80"
         >
           {loading ? t("profile.updating") : t("profile.update")}
         </button>
         <Link
-          className="text-white bg-green-600 p-3 rounded-lg font-semibold text-center hover:bg-green-500 transition cursor-pointer"
+          className="text-white bg-green-600 p-3 rounded-lg font-semibold text-center hover:bg-green-700 transition cursor-pointer"
           to="/createlistingform"
         >
           {t("profile.createListing")}
