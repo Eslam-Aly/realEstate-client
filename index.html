@@ -3,18 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      const lang =
+        navigator.language && navigator.language.startsWith("ar") ? "ar" : "en";
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    </script>
     <!-- Primary SEO -->
     <title>AqarDot – Buy & Rent Properties in Egypt | عقار دوت</title>
     <meta
       name="description"
-      content="AqarDot (عقار دوت) helps you find apartments, villas, and shops for sale and rent across Egypt. ابحث عن شقق، فلل ومحلات للبيع والإيجار في مصر بسهولة."
+      content="AqarDot (عقار دوت) helps you buy or rent apartments, villas, and shops anywhere in Egypt. ابحث عن الشقق والفلل والمحلات للبيع أو للإيجار في جميع محافظات مصر بسهولة."
     />
     <meta
       name="keywords"
-      content="عقار, شقق للبيع, عقار دوت, شقق للإيجار, عقارات مصر, شقق القاهرة, شقق الإسكندرية, فلل للبيع, فلل للإيجار, Aqar, AqarDot, apartments Egypt, buy apartment Cairo, rent apartment Egypt"
+      content="عقار دوت, شقق للبيع, شقق للإيجار, فلل للبيع مصر, شقق القاهرة, عقارات مصر, AqarDot, apartments Egypt, buy apartment Cairo, rent apartment Egypt"
     />
     <meta name="robots" content="index,follow" />
     <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="canonical" href="https://aqardot.com/" />
 
     <!-- Open Graph (for social sharing) -->
     <meta
@@ -27,10 +34,9 @@
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://aqardot.com" />
-    <meta
-      property="og:image"
-      content="https://aqardot.com/email-assets/aqardot-logo-blue.png"
-    />
+    <meta property="og:image" content="https://aqardot.com/logoBlue.png" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="ar_EG" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -42,16 +48,28 @@
       name="twitter:description"
       content="AqarDot (عقار دوت) helps you find apartments, villas، فلل ومحلات للبيع والإيجار في مصر."
     />
-    <meta
-      name="twitter:image"
-      content="https://aqardot.com/email-assets/aqardot-logo-blue.png"
-    />
+    <meta name="twitter:image" content="https://aqardot.com/logoBlue.png" />
 
     <!-- Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "AqarDot",
+        "alternateName": "عقار دوت",
+        "url": "https://aqardot.com",
+        "image": "https://aqardot.com/logoBlue.png",
+        "logo": "https://aqardot.com/logoBlue.png",
+        "description": "AqarDot helps you find apartments, villas, and shops for sale and rent across Egypt.",
+        "areaServed": ["Egypt"],
+        "inLanguage": ["ar", "en"]
+      }
+    </script>
   </head>
 
   <body>
