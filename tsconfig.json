@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "strict": false,
+    "types": ["node", "vite/client", "vitest", "@playwright/test"]
+  },
+  "include": [
+    "src",
+    "playwright.config.ts",
+    "playwright/**/*.ts",
+    "vite.config.ts",
+    "vitest.config.js"
+  ]
+}

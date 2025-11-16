@@ -647,6 +647,7 @@ export default function CreateListingForm() {
             {t("createListing.form.purposeLabel")}
           </span>
           <select
+            data-testid="purpose-select"
             className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
@@ -664,6 +665,7 @@ export default function CreateListingForm() {
             {t("createListing.form.categoryLabel")}
           </span>
           <select
+            data-testid="category-select"
             className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -695,6 +697,7 @@ export default function CreateListingForm() {
                     {t("createListing.form.governorateLabel")}
                   </span>
                   <select
+                    data-testid="gov-select"
                     className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
                     value={selectedGov?.slug || ""}
                     onChange={(e) => {
@@ -722,6 +725,7 @@ export default function CreateListingForm() {
                     {t("createListing.form.cityLabel")}
                   </span>
                   <select
+                    data-testid="city-select"
                     className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
                     value={selectedCity?.slug || ""}
                     onChange={(e) => {
@@ -758,6 +762,7 @@ export default function CreateListingForm() {
                       })}
                     </span>
                     <select
+                      data-testid="area-select"
                       className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
                       value={selectedArea?.slug || ""}
                       onChange={(e) => {
@@ -792,6 +797,7 @@ export default function CreateListingForm() {
                       {t("createListing.form.otherAreaLabel")}
                     </span>
                     <input
+                      data-testid="other-city-input"
                       className="border rounded-md px-3 py-2"
                       type="text"
                       placeholder={t("createListing.form.otherAreaPlaceholder")}
@@ -808,6 +814,7 @@ export default function CreateListingForm() {
               <label key={key} className="flex flex-col gap-1">
                 <span className="text-sm">{def.label}</span>
                 <select
+                  data-testid={`field-${key}`}
                   className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
                   value={v || ""}
                   onChange={(e) => onChange(key, e.target.value, def)}
@@ -831,6 +838,7 @@ export default function CreateListingForm() {
                 className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer"
               >
                 <input
+                  data-testid={`field-${key}`}
                   type="checkbox"
                   checked={v}
                   onChange={(e) => onChange(key, e.target.checked, def)}
@@ -847,6 +855,7 @@ export default function CreateListingForm() {
               >
                 <span className="text-sm">{def.label}</span>
                 <textarea
+                  data-testid={`field-${key}`}
                   className="border rounded-md px-3 py-2 min-h-28"
                   placeholder={def.placeholder}
                   value={v}
@@ -859,6 +868,7 @@ export default function CreateListingForm() {
             <label key={key} className="flex flex-col gap-1">
               <span className="text-sm">{def.label}</span>
               <input
+                data-testid={`field-${key}`}
                 className="border rounded-md px-3 py-2"
                 type={def.type}
                 min={def.min}
@@ -878,6 +888,7 @@ export default function CreateListingForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label className="flex flex-col gap-1">
           <input
+            data-testid="contact-phone"
             type="tel"
             id="contactPhone"
             placeholder="+2010xxxxxxxx"

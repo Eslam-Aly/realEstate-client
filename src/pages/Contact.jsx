@@ -49,6 +49,7 @@ export default function ContactPage() {
       <p className="mt-6 text-gray-700">{t("description")}</p>
 
       <form
+        data-testid="contact-form"
         onSubmit={handleSubmit}
         className="rounded-2xl border bg-white p-5 shadow-sm mt-2"
       >
@@ -105,10 +106,14 @@ export default function ContactPage() {
             {loading ? "…" : t("form.submit")}
           </button>
           {status === "success" && (
-            <p className="text-green-700 text-sm">{t("form.success")}</p>
+            <p data-testid="contact-success" className="text-green-700 text-sm">
+              {t("form.success")}
+            </p>
           )}
           {status === "error" && (
-            <p className="text-red-700 text-sm">{t("form.error")}</p>
+            <p data-testid="contact-error" className="text-red-700 text-sm">
+              {t("form.error")}
+            </p>
           )}
         </div>
       </form>
