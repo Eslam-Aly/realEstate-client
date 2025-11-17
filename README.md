@@ -89,11 +89,30 @@ The dev server proxies API calls directly to the `VITE_API_BASE` you provide. En
 
 ## Automated Testing
 
-Vitest + Testing Library specs live under `src/pages/__tests__/` and `src/redux/user/__tests__/`. Run them locally with:
+- **Unit/component tests (Vitest)**  
+  Specs now live under `tests/unit/**` (mirroring `pages/`, `components/`, `redux/`, etc.). Run the full suite with:
 
-```bash
-npm test
-```
+  ```bash
+  npm test
+  ```
+
+  Vitest is already configured with jsdom globals and the shared `src/setupTests.js`.
+
+- **Smoke/E2E tests (Playwright)**  
+  Playwright specs reside in `tests/smoke/**` and reuse `.env.e2e` for credentials/URLs. To execute them locally:
+
+  ```bash
+  # install browsers once
+  npx playwright install
+
+  # run headless smoke tests
+  npx playwright test
+
+  # or explicitly point to this repo's config
+  npx playwright test --config=playwright.config.ts
+  ```
+
+  Ensure `.env.e2e` contains the variables referenced by the smoke tests (e.g., `BASE_URL`, seeded user credentials).
 
 ---
 
