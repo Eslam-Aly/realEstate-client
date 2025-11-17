@@ -108,11 +108,7 @@ function SignUp() {
           {t("auth.signUpTitle")}
         </h1>
 
-        <form
-          data-testid="signup-form"
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-5 "
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 ">
           <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
             {t("auth.username")}
             <input
@@ -192,7 +188,6 @@ function SignUp() {
           <button
             disabled={loading}
             type="submit"
-            data-testid="signup-submit"
             className="bg-blue-800 text-white p-3 rounded-lg font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? t("auth.loading") : t("auth.signUp")}

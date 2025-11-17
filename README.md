@@ -84,43 +84,16 @@ The dev server proxies API calls directly to the `VITE_API_BASE` you provide. En
 | `npm run preview` | Serve the built bundle locally for smoke testing |
 | `npm run lint`  | Run ESLint using the flat config (`eslint.config.js`) |
 | `npm test`      | Run Vitest + Testing Library unit/component suites |
-| `npm run test:e2e` | Execute Playwright smoke tests against a deployed environment |
 
 ---
 
 ## Automated Testing
 
-### Vitest + Testing Library
-
-UI units/integration specs live under `src/pages/__tests__/` and `src/redux/user/__tests__/`. Run them locally with:
+Vitest + Testing Library specs live under `src/pages/__tests__/` and `src/redux/user/__tests__/`. Run them locally with:
 
 ```bash
 npm test
 ```
-
-### Playwright E2E Smoke Tests
-
-End-to-end journeys are located in `playwright/e2e/smoke.spec.ts` and exercise the real deployment (no mocks). Provide the target URLs and credentials via environment variables before running:
-
-| Variable | Description |
-| -------- | ----------- |
-| `E2E_BASE_URL` | Base URL of the deployed client (e.g., `https://aqardot.com`). |
-| `E2E_OWNER_EMAIL` / `E2E_OWNER_PASSWORD` | Existing owner account used to create listings. |
-| `E2E_CLIENT_EMAIL` | (Optional) Email used when submitting the contact form. |
-| `E2E_SIGNUP_EMAIL`, `E2E_SIGNUP_PASSWORD`, `E2E_SIGNUP_USERNAME` | (Optional) Override the auto-generated credentials for the signup smoke. |
-| `E2E_LISTING_TITLE`, `E2E_LISTING_QUERY` | (Optional) Customize listing titles and search queries. |
-
-Then install Playwright browsers and run the suite:
-
-```bash
-# first time only
-npx playwright install
-
-# run the smoke tests
-npm run test:e2e
-```
-
-> These tests create real accounts/listings against the environment you target. Point them to a staging deployment with disposable credentials.
 
 ---
 
