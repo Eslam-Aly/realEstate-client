@@ -29,10 +29,6 @@ jobs:
         run: npm ci
 
       - name: Run frontend unit/integration tests
-        run: |
-          if npm run test:unit -- --runInBand; then
-            echo "Ran test:unit";
-          else
-            echo "No test:unit script, falling back to test";
-            npm test -- --runInBand
-          fi
+        env:
+          CI: true
+        run: npm test -- --run

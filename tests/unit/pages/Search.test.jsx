@@ -115,12 +115,16 @@ describe("Search page", () => {
     const govSelect = await screen.findByRole("combobox", {
       name: "search.governorate",
     });
+    await waitFor(() => expect(govSelect.options.length).toBeGreaterThan(1));
     await user.selectOptions(govSelect, "cairo");
 
     const citySelect = await screen.findByRole("combobox", {
       name: "search.city",
     });
-    await waitFor(() => expect(citySelect).not.toBeDisabled());
+    await waitFor(() => {
+      expect(citySelect).not.toBeDisabled();
+      expect(citySelect.options.length).toBeGreaterThan(1);
+    });
     await user.selectOptions(citySelect, "new-cairo");
 
     const areaSelect = await screen.findByRole("combobox", {
