@@ -4,8 +4,8 @@ import reducer, {
   rollbackToggle,
   hydrateFavorites,
   toggleFavorite,
-} from "../favoritesSlice.js";
-import API from "../../../config/api.js";
+} from "../../../../src/redux/user/favoritesSlice.js";
+import API from "../../../../src/config/api.js";
 
 const originalFetch = global.fetch;
 

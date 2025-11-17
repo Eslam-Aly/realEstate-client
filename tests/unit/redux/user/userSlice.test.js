@@ -11,7 +11,7 @@ import reducer, {
   signOutStart,
   signOutSuccess,
   signOutFaliure,
-} from "../userSlice.js";
+} from "../../../../src/redux/user/userSlice.js";
 
 const initial = {
   currentUser: null,

@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import { setupServer } from "msw/node";
 import { http, HttpResponse, delay } from "msw";
-import Search from "../Search.jsx";
+import Search from "../../../src/pages/Search.jsx";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -12,7 +12,7 @@ vi.mock("react-i18next", () => ({
   }),
 }));
 
-vi.mock("../../components/ListingItems.jsx", () => ({
+vi.mock("../../../src/components/ListingItems.jsx", () => ({
   default: ({ listing }) => (
     <div data-testid="listing-card">{listing.title}</div>
   ),

@@ -638,7 +638,10 @@ function Search() {
         ) : listings.length === 0 ? (
           <div className="text-slate-600">{t("search.noResults")}</div>
         ) : (
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <div
+            className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+            data-testid="listing-grid"
+          >
             {listings.map((listing) => (
               <ListingItems key={listing._id || listing.id} listing={listing} />
             ))}

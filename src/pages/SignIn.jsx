@@ -197,6 +197,7 @@ function SignIn() {
         )}
         <form onSubmit={handleSubmit} className="flex flex-col gap-5 ">
           <input
+            data-testid="signin-email"
             onChange={handleChange}
             type="email"
             id="email"
@@ -204,6 +205,7 @@ function SignIn() {
             className="border p-3 rounded-lg "
           />
           <input
+            data-testid="signin-password"
             onChange={handleChange}
             type="password"
             id="password"
@@ -245,6 +247,7 @@ function SignIn() {
             )}
           </div>
           <button
+            data-testid="signin-submit"
             disabled={loading}
             type="submit"
             className="bg-blue-800 text-white p-3 rounded-lg font-semibold"

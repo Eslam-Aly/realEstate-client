@@ -58,7 +58,6 @@ function Profile() {
         setFavError("");
         const res = await fetch(`${API}/favorites?limit=6`, {
           credentials: "include",
-          headers: authHeaders(),
         });
         if (!res.ok) throw new Error(`Favorites fetch failed (${res.status})`);
         const data = await res.json();
@@ -80,12 +79,6 @@ function Profile() {
     handleShowListings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?._id]);
-
-  const authHeaders = () => {
-    const token =
-      localStorage.getItem("token") || localStorage.getItem("access_token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
 
   const handleFileUpload = (file) => {
     const storage = getStorage(app);
@@ -199,14 +192,9 @@ function Profile() {
     const ok = window.confirm(t("profile.confirmDeleteListing"));
     if (!ok) return;
     try {
-      const token =
-        localStorage.getItem("token") ||
-        localStorage.getItem("access_token") ||
-        "";
       const res = await fetch(`${API}/listings/delete/${listingId}`, {
         method: "DELETE",
         credentials: "include",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.success === false) {
@@ -298,6 +286,7 @@ function Profile() {
           {loading ? t("profile.updating") : t("profile.update")}
         </button>
         <Link
+          data-testid="profile-create-listing-link"
           className="text-white bg-green-600 p-3 rounded-lg font-semibold text-center hover:bg-green-700 transition cursor-pointer"
           to="/createlistingform"
         >
@@ -322,6 +311,7 @@ function Profile() {
           {t("profile.deleteAccount")}
         </button>
         <button
+          data-testid="profile-logout-button"
           onClick={handleSignOut}
           className="hover:underline cursor-pointer"
         >

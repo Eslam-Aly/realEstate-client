@@ -1,5 +1,5 @@
 import { render, waitFor } from "@testing-library/react";
-import Favorites from "../Favorites.jsx";
+import Favorites from "../../../src/pages/Favorites.jsx";
 
 const mockNavigate = vi.fn();
 const state = { user: { currentUser: null } };
@@ -16,7 +16,7 @@ vi.mock("react-redux", () => ({
   useSelector: (selector) => selector(state),
 }));
 
-vi.mock("../../components/ListingItems.jsx", () => ({
+vi.mock("../../../src/components/ListingItems.jsx", () => ({
   default: ({ listing }) => <div data-testid="listing">{listing.title}</div>,
 }));
 

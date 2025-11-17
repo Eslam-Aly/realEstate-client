@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import ContactPage from "../Contact.jsx";
+import ContactPage from "../../../src/pages/Contact.jsx";
 
 const originalFetch = global.fetch;
 const originalWindowFetch = typeof window !== "undefined" ? window.fetch : undefined;

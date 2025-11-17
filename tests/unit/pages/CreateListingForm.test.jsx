@@ -1,7 +1,7 @@
 import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import CreateListingForm from "../CreateListingForm.jsx";
+import CreateListingForm from "../../../src/pages/CreateListingForm.jsx";
 
 const originalFetch = global.fetch;
 
@@ -17,7 +17,7 @@ vi.mock("react-i18next", () => ({
   }),
 }));
 
-vi.mock("../../firebase.js", () => ({
+vi.mock("../../../src/firebase.js", () => ({
   app: {},
 }));
 

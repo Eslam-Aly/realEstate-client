@@ -8,5 +8,6 @@ export default defineConfig({
     globals: true,
     setupFiles: "./src/setupTests.js",
     reporters: ["verbose"],
+    include: ["tests/unit/**/*.{test,spec}.{js,jsx,ts,tsx}"],
   },
 });

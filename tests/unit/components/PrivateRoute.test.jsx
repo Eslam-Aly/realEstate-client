@@ -2,8 +2,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
-import PrivateRoute from "../PrivateRoute.jsx";
-import userReducer from "../../redux/user/userSlice.js";
+import PrivateRoute from "../../../src/components/PrivateRoute.jsx";
+import userReducer from "../../../src/redux/user/userSlice.js";
 
 function renderWithStore(currentUser) {
   const store = configureStore({

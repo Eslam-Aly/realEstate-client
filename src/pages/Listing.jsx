@@ -335,14 +335,9 @@ function Listing() {
     const ok = window.confirm("Delete this listing?");
     if (!ok) return;
     try {
-      const token =
-        localStorage.getItem("token") ||
-        localStorage.getItem("access_token") ||
-        "";
       const res = await fetch(`${API}/listings/delete/${listing._id}`, {
         method: "DELETE",
         credentials: "include",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || "Delete failed");
@@ -475,6 +470,7 @@ function Listing() {
                 {listing.images.map((image, index) => (
                   <SwiperSlide key={index}>
                     <img
+                      data-testid="listing-images"
                       src={image}
                       alt={listing.title}
                       className="w-full h-[550px] object-cover rounded"
@@ -492,6 +488,7 @@ function Listing() {
               </Swiper>
               <div className="absolute top-4 right-4 flex gap-3 z-20">
                 <button
+                  data-testid="listing-favorite-button"
                   onClick={onHeartClick}
                   onMouseDown={(e) => e.stopPropagation()}
                   onKeyDown={(e) => e.stopPropagation()}
@@ -510,6 +507,7 @@ function Listing() {
                   />
                 </button>
                 <button
+                  data-testid="listing-share-button"
                   onClick={handleShare}
                   onMouseDown={(e) => e.stopPropagation()}
                   onKeyDown={(e) => e.stopPropagation()}
@@ -523,7 +521,12 @@ function Listing() {
             </div>
           )}
           <div className=" my-6 gap-8">
-            <h1 className="text-3xl font-bold mb-2 ">{listing.title}</h1>
+            <h1
+              data-testid="listing-title"
+              className="text-3xl font-bold mb-2 "
+            >
+              {listing.title}
+            </h1>
             <div className="flex items-center gap-3 mb-2">
               {getPurpose(listing) && (
                 <span
@@ -554,7 +557,10 @@ function Listing() {
               )}
             </div>
             <div className="flex items-center gap-3">
-              <p className="text-2xl font-semibold text-gray-600">
+              <p
+                data-testid="listing-price"
+                className="text-2xl font-semibold text-gray-600"
+              >
                 {getPrice(listing) !== undefined
                   ? `${getPrice(listing).toLocaleString()} ${t(
                       "listing.price"
@@ -877,12 +883,14 @@ function Listing() {
               // Owner view: Edit / Delete buttons
               <div className="mt-6 flex gap-4">
                 <Link
+                  data-testid="listing-owner-edit-button"
                   to={`/update-listing/${listing._id}`}
                   className="px-9 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:opacity-90 cursor-pointer"
                 >
                   {t("listing.edit")}
                 </Link>
                 <button
+                  data-testid="listing-owner-delete-button"
                   type="button"
                   onClick={handleDelete}
                   className="px-6 py-2 rounded-lg bg-red-600 text-white font-semibold hover:opacity-90 cursor-pointer"
@@ -896,6 +904,7 @@ function Listing() {
                 {phone && (
                   <li>
                     <a
+                      data-testid="listing-call-seller-button"
                       className="btn bg-blue-700 text-white hover:bg-blue-800 rounded-lg cursor-pointer py-4 px-6 transition"
                       href={`tel:${phone}`}
                     >
@@ -906,6 +915,7 @@ function Listing() {
                 {waEnabled && phone && (
                   <li>
                     <a
+                      data-testid="listing-contact-whatsapp-button"
                       className="btn rounded-lg bg-green-600 text-white hover:bg-green-700 px-6 py-4 transition"
                       href={waLink}
                       target="_blank"
@@ -923,6 +933,7 @@ function Listing() {
               {phone && (
                 <li>
                   <a
+                    data-testid="listing-call-seller-button"
                     className="btn bg-blue-700 text-white hover:bg-blue-800 rounded-lg cursor-pointer py-4 px-6 transition"
                     href="/signin"
                   >
@@ -933,6 +944,7 @@ function Listing() {
               {waEnabled && phone && (
                 <li>
                   <a
+                    data-testid="listing-contact-whatsapp-button"
                     className="btn rounded-lg bg-green-600 text-white hover:bg-green-700 px-6 py-4 transition"
                     href="/signin"
                   >

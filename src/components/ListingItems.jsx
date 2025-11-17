@@ -139,7 +139,10 @@ function ListingItems({ listing }) {
   };
 
   return (
-    <div className="bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[330px] sm:mx-auto">
+    <div
+      data-testid="listing-card"
+      className="bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[330px] sm:mx-auto"
+    >
       <Link to={`/listing/${id}`}>
         <div className="relative">
           <img

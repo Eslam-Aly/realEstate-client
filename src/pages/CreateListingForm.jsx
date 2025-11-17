@@ -17,7 +17,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { useSelector } from "react-redux";
 
-/** 1) Option metadata */
+// ---------------------------- Option metadata ----------------------------
 const PURPOSE_OPTIONS = [
   { value: "rent", labelKey: "createListing.purpose.rent" },
   { value: "sale", labelKey: "createListing.purpose.sale" },
@@ -52,7 +52,7 @@ const LICENSE_OPTIONS = [
   "other",
 ];
 
-/** 2) Field registry (translation keys) */
+// ---------------------------- Field configuration (translation keys) ----------------------------
 const FIELD_CONFIG = {
   // shared
   title: {
@@ -164,7 +164,7 @@ const FIELD_CONFIG = {
   },
 };
 
-/** 3) Category → which fields show */
+// ---------------------------- Category → which fields show ----------------------------
 const FIELDS_BY_CATEGORY = {
   apartment: [
     "title",
@@ -275,7 +275,7 @@ export default function CreateListingForm() {
   const [category, setCategory] = useState(CATEGORY_OPTIONS[0]);
   const [form, setForm] = useState({}); // all dynamic fields live here
 
-  // Location (governorate/city) state
+  // ---------------------------- Location (governorate/city) state ----------------------------
   const [govs, setGovs] = useState([]); // [{name, slug}]
   const [cities, setCities] = useState([]); // [{name, slug}]
   const [selectedGov, setSelectedGov] = useState(null); // {name, slug}
@@ -310,8 +310,10 @@ export default function CreateListingForm() {
   const fileRef = useRef(null);
   const MAX_IMAGES = 6;
 
+  // ---------------------------- Location fetching ----------------------------
   // Fetch governorates on mount & language change
   useEffect(() => {
+    // Fetches the list of governorates when the component mounts or the language changes.
     let active = true;
     fetch(`${API}/locations/governorates?lang=${langParam}`)
       .then((r) => r.json())
@@ -337,6 +339,7 @@ export default function CreateListingForm() {
 
   // Fetch cities when governorate changes
   useEffect(() => {
+    // Fetches the list of cities for the selected governorate.
     let active = true;
     if (!selectedGov) {
       setCities([]);
@@ -374,6 +377,7 @@ export default function CreateListingForm() {
 
   // Fetch areas when city changes
   useEffect(() => {
+    // Fetches the list of areas for the selected city.
     let active = true;
     // If no city or city is "other", clear areas
     if (!selectedGov || !selectedCity || selectedCity.slug === "other") {
@@ -440,15 +444,14 @@ export default function CreateListingForm() {
     setForm((p) => ({ ...p, [key]: v }));
   };
 
-  const getToken = () =>
-    localStorage.getItem("token") || localStorage.getItem("access_token") || "";
-
-  // Firebase image uploader helpers
+  // ---------------------------- Image upload handling ----------------------------
+  // Clears the file input and resets file state
   const clearFileInput = () => {
     setFile([]);
     if (fileRef.current) fileRef.current.value = "";
   };
 
+  // Uploads a single image file to Firebase Storage and resolves with the URL
   const storeImage = async (file) => {
     return new Promise((resolve, reject) => {
       const storage = getStorage(app);
@@ -476,6 +479,7 @@ export default function CreateListingForm() {
     });
   };
 
+  // Handles the image upload button click: validates, uploads images, handles errors and progress.
   const handleImageSubmit = async () => {
     // replicate old constraints: max 6 total images
     const current = images.length;
@@ -520,6 +524,7 @@ export default function CreateListingForm() {
     }
   };
 
+  // Removes an uploaded image by index
   const handleRemoveImage = (index) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
@@ -528,6 +533,8 @@ export default function CreateListingForm() {
     return raw.replace(/[\s\-().]/g, "");
   }
 
+  // ---------------------------- Form validation & submit ----------------------------
+  // Handles form submission: validates fields, prepares payload, sends API request, handles response and errors.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError("");
@@ -595,7 +602,6 @@ export default function CreateListingForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
         },
         credentials: "include",
         body: JSON.stringify(payload),
@@ -631,8 +637,10 @@ export default function CreateListingForm() {
     }
   };
 
+  // ---------------------------- JSX layout ----------------------------
   return (
     <form
+      data-testid="create-form"
       onSubmit={handleSubmit}
       className="max-w-xl mx-auto p-4 space-y-4 shadow-lg rounded-md mt-16 overflow-x-hidden"
       dir={isAr ? "rtl" : "ltr"}
@@ -647,6 +655,7 @@ export default function CreateListingForm() {
             {t("createListing.form.purposeLabel")}
           </span>
           <select
+            data-testid="create-purpose"
             className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
@@ -664,6 +673,7 @@ export default function CreateListingForm() {
             {t("createListing.form.categoryLabel")}
           </span>
           <select
+            data-testid="create-category"
             className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -695,6 +705,7 @@ export default function CreateListingForm() {
                     {t("createListing.form.governorateLabel")}
                   </span>
                   <select
+                    data-testid="create-governorate"
                     className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
                     value={selectedGov?.slug || ""}
                     onChange={(e) => {
@@ -722,6 +733,7 @@ export default function CreateListingForm() {
                     {t("createListing.form.cityLabel")}
                   </span>
                   <select
+                    data-testid="create-city"
                     className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
                     value={selectedCity?.slug || ""}
                     onChange={(e) => {
@@ -808,6 +820,7 @@ export default function CreateListingForm() {
               <label key={key} className="flex flex-col gap-1">
                 <span className="text-sm">{def.label}</span>
                 <select
+                  data-testid={`create-${key}`}
                   className="border rounded-md px-3 py-2 appearance-none cursor-pointer"
                   value={v || ""}
                   onChange={(e) => onChange(key, e.target.value, def)}
@@ -847,6 +860,7 @@ export default function CreateListingForm() {
               >
                 <span className="text-sm">{def.label}</span>
                 <textarea
+                  data-testid={`create-${key}`}
                   className="border rounded-md px-3 py-2 min-h-28"
                   placeholder={def.placeholder}
                   value={v}
@@ -855,10 +869,16 @@ export default function CreateListingForm() {
               </label>
             );
           }
+          // Add data-testid for title input and for all number/text inputs
+          let inputTestId = undefined;
+          if (key === "title") inputTestId = "create-title";
+          else if (def.type === "number" || def.type === "text")
+            inputTestId = `create-${key}`;
           return (
             <label key={key} className="flex flex-col gap-1">
               <span className="text-sm">{def.label}</span>
               <input
+                data-testid={inputTestId}
                 className="border rounded-md px-3 py-2"
                 type={def.type}
                 min={def.min}
@@ -878,6 +898,7 @@ export default function CreateListingForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label className="flex flex-col gap-1">
           <input
+            data-testid="create-contact-phone"
             type="tel"
             id="contactPhone"
             placeholder="+2010xxxxxxxx"
@@ -889,6 +910,7 @@ export default function CreateListingForm() {
         </label>
         <label className="inline-flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
           <input
+            data-testid="create-contact-whatsapp"
             type="checkbox"
             checked={form.whatsapp !== false}
             onChange={(e) => setForm({ ...form, whatsapp: e.target.checked })}
@@ -901,6 +923,7 @@ export default function CreateListingForm() {
       <div className="flex flex-col gap-3 sm:col-span-2">
         <div className="flex flex-col sm:flex-row gap-2">
           <input
+            data-testid="create-images-input"
             ref={fileRef}
             className="border p-3 rounded-lg cursor-pointer hover:bg-gray-100 transition w-full"
             type="file"
@@ -910,6 +933,7 @@ export default function CreateListingForm() {
             onChange={(e) => setFile(e.target.files)}
           />
           <button
+            data-testid="create-images-upload-button"
             type="button"
             disabled={uploading}
             onClick={handleImageSubmit}
@@ -922,7 +946,10 @@ export default function CreateListingForm() {
         </div>
 
         {uploading && uploadProgress > 0 && (
-          <div className="w-full bg-gray-200 rounded-full h-2.5 my-2">
+          <div
+            data-testid="create-images-upload-progress"
+            className="w-full bg-gray-200 rounded-full h-2.5 my-2"
+          >
             <div
               className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
               style={{ width: `${uploadProgress}%` }}
@@ -936,7 +963,9 @@ export default function CreateListingForm() {
         )}
 
         {imageUploadError && (
-          <p className="text-red-700 text-sm">{imageUploadError}</p>
+          <p data-testid="create-images-error" className="text-red-700 text-sm">
+            {imageUploadError}
+          </p>
         )}
 
         {images.length > 0 &&
@@ -966,19 +995,26 @@ export default function CreateListingForm() {
         )}
       </div>
 
-      {(submitError || submitSuccess) && (
+      {/* Submit success/error feedback */}
+      {submitError && (
         <div
-          className={`text-sm rounded-md px-3 py-2 ${
-            submitError
-              ? "bg-red-50 text-red-700"
-              : "bg-green-50 text-green-700"
-          }`}
+          data-testid="create-submit-error"
+          className="text-sm rounded-md px-3 py-2 bg-red-50 text-red-700"
         >
-          {submitError || submitSuccess}
+          {submitError}
+        </div>
+      )}
+      {submitSuccess && (
+        <div
+          data-testid="create-submit-success"
+          className="text-sm rounded-md px-3 py-2 bg-green-50 text-green-700"
+        >
+          {submitSuccess}
         </div>
       )}
 
       <button
+        data-testid="create-submit"
         disabled={submitting}
         className={`w-full rounded-lg px-4 py-3 text-white cursor-pointer hover:bg-blue-500 ${
           submitting ? "bg-indigo-400" : "bg-indigo-600 hover:opacity-95"

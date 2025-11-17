@@ -16,9 +16,6 @@ import API from "../config/api.js";
 
 const DEFAULT_IMAGE_URL =
   import.meta?.env?.VITE_DEFAULT_LISTING_IMAGE || "/placeholder.jpg";
-const getToken = () =>
-  localStorage.getItem("token") || localStorage.getItem("access_token") || "";
-
 /** 1) Option metadata */
 const PURPOSE_OPTIONS = [
   { value: "rent", labelKey: "createListing.purpose.rent" },
@@ -698,7 +695,6 @@ export default function UpdateListing() {
         method: "PATCH", // your routes use PATCH for update
         headers: {
           "Content-Type": "application/json",
-          ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
         },
         credentials: "include",
         body: JSON.stringify(payload),
