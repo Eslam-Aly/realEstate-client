@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      E2E_BASE_URL: ${{ secrets.BASE_URL_STAGING }}
+      BASE_URL: ${{ secrets.BASE_URL_STAGING }}
       TEST_OWNER_EMAIL: ${{ secrets.TEST_OWNER_EMAIL }}
       TEST_OWNER_PASSWORD: ${{ secrets.TEST_OWNER_PASSWORD }}
       TEST_CLIENT_EMAIL: ${{ secrets.TEST_CLIENT_EMAIL }}
