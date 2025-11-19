@@ -31,6 +31,9 @@ test.describe("Aqardot - Sign In Page", () => {
     await page.getByTestId("signin-password").fill(TEST_OWNER_PASSWORD);
     await page.getByTestId("signin-submit").click();
 
+    // Remote environments can take a bit longer to respond, so wait for the redirect home.
+    await expect(page).toHaveURL(/\/$/, { timeout: 20000 });
+
     // After login we expect navbar to show profile avatar link
     await expect(page.getByTestId("navbar-profile-link")).toBeVisible();
     await expect(page.getByTestId("navbar-login-link")).toHaveCount(0);

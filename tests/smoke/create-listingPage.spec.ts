@@ -8,6 +8,8 @@ async function signInAsTestUser(page) {
   await page.getByTestId("signin-email").fill(TEST_OWNER_EMAIL);
   await page.getByTestId("signin-password").fill(TEST_OWNER_PASSWORD);
   await page.getByTestId("signin-submit").click();
+  // Allow extra time for the remote environment to complete the redirect + cookie write.
+  await expect(page).toHaveURL(/\/$/, { timeout: 20000 });
   await expect(page.getByTestId("navbar-profile-link")).toBeVisible();
 }
 
