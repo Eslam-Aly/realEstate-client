@@ -1,0 +1,43 @@
+name: Smoke Test - Production
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  wait-for-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Vercel + Render to deploy
+        run: sleep 60
+
+  smoke-prod:
+    needs: wait-for-deploy
+    runs-on: ubuntu-latest
+
+    env:
+      BASE_URL: ${{ secrets.BASE_URL_PRODUCTION }}
+      TEST_OWNER_EMAIL: ${{ secrets.TEST_OWNER_EMAIL }}
+      TEST_OWNER_PASSWORD: ${{ secrets.TEST_OWNER_PASSWORD }}
+      TEST_CLIENT_EMAIL: ${{ secrets.TEST_CLIENT_EMAIL }}
+      TEST_CLIENT_PASSWORD: ${{ secrets.TEST_CLIENT_PASSWORD }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+
+      - name: Run production smoke tests
+        run: npm run test:e2e:smoke
