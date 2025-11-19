@@ -65,7 +65,8 @@ test.describe("Aqardot - Create Listing", () => {
     // await expect(page.getByText(/listing created successfully/i)).toBeVisible();
 
     // Option B: redirect to listing details page and see title
-    await expect(page).toHaveURL(/\/listing[s]?\/.+/);
+    // Expected URL shape: /listing/691d0536f4a1f6f19344fa7c
+    await expect(page).toHaveURL(/\/listing\/[0-9a-fA-F]{24}$/);
     await expect(page.getByTestId("listing-title")).toContainText(title);
   });
 });
