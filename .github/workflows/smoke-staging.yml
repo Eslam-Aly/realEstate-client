@@ -1,0 +1,36 @@
+name: Smoke Test - Staging
+
+on:
+  push:
+    branches: ["staging"]
+
+jobs:
+  smoke-staging:
+    runs-on: ubuntu-latest
+
+    env:
+      E2E_BASE_URL: ${{ secrets.BASE_URL_STAGING }}
+      TEST_OWNER_EMAIL: ${{ secrets.TEST_OWNER_EMAIL }}
+      TEST_OWNER_PASSWORD: ${{ secrets.TEST_OWNER_PASSWORD }}
+      TEST_CLIENT_EMAIL: ${{ secrets.TEST_CLIENT_EMAIL }}
+      TEST_CLIENT_PASSWORD: ${{ secrets.TEST_CLIENT_PASSWORD }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run staging smoke tests
+        run: npm run test:e2e:smoke
