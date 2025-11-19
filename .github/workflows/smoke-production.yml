@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      E2E_BASE_URL: ${{ secrets.BASE_URL_PRODUCTION }}
+      BASE_URL: ${{ secrets.BASE_URL_PRODUCTION }}
       TEST_OWNER_EMAIL: ${{ secrets.TEST_OWNER_EMAIL }}
       TEST_OWNER_PASSWORD: ${{ secrets.TEST_OWNER_PASSWORD }}
       TEST_CLIENT_EMAIL: ${{ secrets.TEST_CLIENT_EMAIL }}
