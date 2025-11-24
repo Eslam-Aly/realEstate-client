@@ -8,6 +8,8 @@ async function signInAsTestUser(page) {
   await page.getByTestId("signin-email").fill(TEST_OWNER_EMAIL);
   await page.getByTestId("signin-password").fill(TEST_OWNER_PASSWORD);
   await page.getByTestId("signin-submit").click();
+  // Allow extra time for the remote environment to complete the redirect + cookie write.
+  await expect(page).toHaveURL(/\/$/, { timeout: 20000 });
   await expect(page.getByTestId("navbar-profile-link")).toBeVisible();
 }
 
@@ -65,7 +67,8 @@ test.describe("Aqardot - Create Listing", () => {
     // await expect(page.getByText(/listing created successfully/i)).toBeVisible();
 
     // Option B: redirect to listing details page and see title
-    await expect(page).toHaveURL(/\/listing[s]?\/.+/);
+    // Expected URL shape: /listing/691d0536f4a1f6f19344fa7c
+    await expect(page).toHaveURL(/\/listing\/[0-9a-fA-F]{24}$/);
     await expect(page.getByTestId("listing-title")).toContainText(title);
   });
 });
