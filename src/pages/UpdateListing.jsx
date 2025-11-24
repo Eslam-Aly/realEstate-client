@@ -13,6 +13,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 import API from "../config/api.js";
+import apiFetch from "../lib/apiFetch.js";
 
 const DEFAULT_IMAGE_URL =
   import.meta?.env?.VITE_DEFAULT_LISTING_IMAGE || "/placeholder.jpg";
@@ -691,14 +692,16 @@ export default function UpdateListing() {
 
     try {
       setLoading(true);
-      const res = await fetch(`${API}/listings/update/${params.listingId}`, {
-        method: "PATCH", // your routes use PATCH for update
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+      const res = await apiFetch(
+        `${API}/listings/update/${params.listingId}`,
+        {
+          method: "PATCH", // your routes use PATCH for update
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.success === false)
         throw new Error(data?.message || t("updateListing.messages.error"));

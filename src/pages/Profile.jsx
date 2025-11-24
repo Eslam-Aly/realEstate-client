@@ -24,6 +24,7 @@ import { Link } from "react-router-dom";
 import ListingItems from "../components/ListingItems.jsx";
 import { useTranslation } from "react-i18next";
 import API from "../config/api.js";
+import apiFetch from "../lib/apiFetch.js";
 
 function Profile() {
   const { t } = useTranslation();
@@ -56,9 +57,7 @@ function Profile() {
       try {
         setFavLoading(true);
         setFavError("");
-        const res = await fetch(`${API}/favorites?limit=6`, {
-          credentials: "include",
-        });
+        const res = await apiFetch(`${API}/favorites?limit=6`);
         if (!res.ok) throw new Error(`Favorites fetch failed (${res.status})`);
         const data = await res.json();
         const list = Array.isArray(data) ? data : data?.results || [];
@@ -117,12 +116,11 @@ function Profile() {
     e.preventDefault();
     try {
       dispatch(updateUserStart());
-      const res = await fetch(`${API}/user/update/${currentUser._id}`, {
+      const res = await apiFetch(`${API}/user/update/${currentUser._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify(formData),
       });
       const data = await res.json();
@@ -141,9 +139,8 @@ function Profile() {
     if (!ok) return;
     try {
       dispatch(deleteUserStart());
-      const res = await fetch(`${API}/user/delete/${currentUser._id}`, {
+      const res = await apiFetch(`${API}/user/delete/${currentUser._id}`, {
         method: "DELETE",
-        credentials: "include",
       });
       const data = await res.json();
       if (data.success === false) {
@@ -158,9 +155,7 @@ function Profile() {
   const handleSignOut = async () => {
     try {
       dispatch(signOutStart());
-      const res = await fetch(`${API}/auth/signout`, {
-        credentials: "include",
-      });
+      const res = await apiFetch(`${API}/auth/signout`);
       const data = await res.json();
       if (data.success === false) {
         dispatch(signOutFaliure(data.message));
@@ -174,9 +169,9 @@ function Profile() {
   const handleShowListings = async () => {
     try {
       setShowListingsError(false);
-      const res = await fetch(`${API}/user/listings/${currentUser._id}`, {
-        credentials: "include",
-      });
+      const res = await apiFetch(
+        `${API}/user/listings/${currentUser._id}`
+      );
 
       const data = await res.json();
       if (data.success === false) {
@@ -192,9 +187,8 @@ function Profile() {
     const ok = window.confirm(t("profile.confirmDeleteListing"));
     if (!ok) return;
     try {
-      const res = await fetch(`${API}/listings/delete/${listingId}`, {
+      const res = await apiFetch(`${API}/listings/delete/${listingId}`, {
         method: "DELETE",
-        credentials: "include",
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.success === false) {

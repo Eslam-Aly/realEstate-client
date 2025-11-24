@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API from "../../config/api.js";
+import apiFetch from "../../lib/apiFetch.js";
 
 /**
  * Pulls the persisted favourite listing ids from the backend when the app boots.
@@ -10,9 +11,7 @@ export const hydrateFavorites = createAsyncThunk(
   "favorites/hydrate",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch(`${API}/favorites/ids`, {
-        credentials: "include",
-      });
+      const res = await apiFetch(`${API}/favorites/ids`);
 
       if (res.status === 401) {
         return rejectWithValue({ unauthorized: true });
@@ -45,10 +44,9 @@ export const toggleFavorite = createAsyncThunk(
     const method = snapshot ? "DELETE" : "POST";
 
     try {
-      const res = await fetch(`${API}/favorites/${listingId}`, {
+      const res = await apiFetch(`${API}/favorites/${listingId}`, {
         method,
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
       });
 
       if (res.status === 401) {

@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import ListingItems from "../components/ListingItems.jsx";
 import API from "../config/api.js";
 import { t } from "i18next";
+import apiFetch from "../lib/apiFetch.js";
 
 /**
  * Lists the current user's saved listings. Anonymous visitors are redirected
@@ -25,9 +26,7 @@ export default function Favorites() {
     (async () => {
       try {
         setL(true);
-        const res = await fetch(`${API}/favorites?limit=24`, {
-          credentials: "include",
-        });
+        const res = await apiFetch(`${API}/favorites?limit=24`);
         if (res.status === 401) {
           if (alive) navigate("/signin", { replace: true });
           return;

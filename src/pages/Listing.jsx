@@ -32,6 +32,7 @@ import {
 
 import { useTranslation } from "react-i18next";
 import API from "../config/api.js";
+import apiFetch from "../lib/apiFetch.js";
 function Listing() {
   // --- Language-aware location rendering ---
   const { t, i18n } = useTranslation();
@@ -335,9 +336,8 @@ function Listing() {
     const ok = window.confirm("Delete this listing?");
     if (!ok) return;
     try {
-      const res = await fetch(`${API}/listings/delete/${listing._id}`, {
+      const res = await apiFetch(`${API}/listings/delete/${listing._id}`, {
         method: "DELETE",
-        credentials: "include",
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || "Delete failed");

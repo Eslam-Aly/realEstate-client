@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import API from "../config/api.js";
+import apiFetch from "../lib/apiFetch.js";
 
 const DEFAULT_IMAGE_URL =
   import.meta?.env?.VITE_DEFAULT_LISTING_IMAGE || "/placeholder.jpg";
@@ -598,12 +599,11 @@ export default function CreateListingForm() {
 
     try {
       setSubmitting(true);
-      const res = await fetch(`${API}/listings/create`, {
+      const res = await apiFetch(`${API}/listings/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify(payload),
       });
       const data = await res.json().catch(() => ({}));
