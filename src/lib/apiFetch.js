@@ -37,6 +37,8 @@ const performRefresh = async () => {
     refreshPromise.finally(() => {
       refreshPromise = null;
     });
+    // Attach a no-op catcher so tests don't see unhandled rejections if callers drop the promise.
+    refreshPromise.catch(() => {});
   }
 
   return refreshPromise;
