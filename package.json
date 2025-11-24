@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "test:e2e:smoke": "playwright test tests/smoke --reporter=line"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.9.0",
