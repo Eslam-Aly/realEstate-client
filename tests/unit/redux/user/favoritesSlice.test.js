@@ -6,8 +6,12 @@ import reducer, {
   toggleFavorite,
 } from "../../../../src/redux/user/favoritesSlice.js";
 import API from "../../../../src/config/api.js";
+import apiFetch from "../../../../src/lib/apiFetch.js";
 
-const originalFetch = global.fetch;
+vi.mock("../../../../src/lib/apiFetch.js", () => ({
+  __esModule: true,
+  default: vi.fn(),
+}));
 
 describe("favorites slice reducers", () => {
   it("optimistically toggles favorites via localToggle/rollbackToggle", () => {
@@ -37,11 +41,11 @@ describe("favorites slice reducers", () => {
 
 describe("hydrateFavorites thunk", () => {
   afterEach(() => {
-    global.fetch = originalFetch;
+    apiFetch.mockReset();
   });
 
   it("stores ids on success", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    apiFetch.mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => ["a", "b"],
@@ -57,11 +61,18 @@ describe("hydrateFavorites thunk", () => {
   });
 
   it("clears state when unauthorized", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: false,
-      status: 401,
-      json: async () => [],
-    });
+    apiFetch
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: async () => [],
+      })
+      // refresh call will be attempted by apiFetch wrapper; return ok so it doesn't throw
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({}),
+      });
     const dispatch = vi.fn();
     await hydrateFavorites()(dispatch, () => ({}), undefined);
     const reducerState = reducer(
@@ -78,16 +89,15 @@ describe("hydrateFavorites thunk", () => {
 
 describe("toggleFavorite thunk", () => {
   afterEach(() => {
-    global.fetch = originalFetch;
+    apiFetch.mockReset();
   });
 
   it("returns nowFavorite flag on success", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({
+    const mockFetch = apiFetch.mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => ({}),
     });
-    global.fetch = mockFetch;
     const result = await toggleFavorite({
       listingId: "foo",
       wasFavorite: false,
@@ -113,7 +123,7 @@ describe("toggleFavorite thunk", () => {
   });
 
   it("propagates rejection metadata for non-401 errors", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    apiFetch.mockResolvedValue({
       ok: false,
       status: 500,
       json: async () => ({}),

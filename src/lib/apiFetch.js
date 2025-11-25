@@ -4,9 +4,23 @@ const REFRESH_URL = `${API}/auth/refresh`;
 let refreshPromise = null;
 let forcedLogout = false;
 let logoutHandler = null;
+const LOGOUT_THROTTLE_KEY = "aqd_last_logout_ts";
+const LOGOUT_THROTTLE_MS = 3000;
 
 export const registerApiAuthHandler = (handler) => {
   logoutHandler = handler;
+};
+
+const shouldRedirect = () => {
+  try {
+    const last = Number(sessionStorage.getItem(LOGOUT_THROTTLE_KEY) || 0);
+    const now = Date.now();
+    if (now - last < LOGOUT_THROTTLE_MS) return false;
+    sessionStorage.setItem(LOGOUT_THROTTLE_KEY, String(now));
+    return true;
+  } catch {
+    return true;
+  }
 };
 
 const hardLogout = () => {
@@ -19,7 +33,12 @@ const hardLogout = () => {
       console.error("Failed to run logout handler", err);
     }
   }
-  window.location.replace("/signin");
+  if (
+    shouldRedirect() &&
+    !["/signin", "/signup"].includes(window.location.pathname)
+  ) {
+    window.location.replace("/signin");
+  }
 };
 
 const performRefresh = async () => {
@@ -37,6 +56,8 @@ const performRefresh = async () => {
     refreshPromise.finally(() => {
       refreshPromise = null;
     });
+    // Attach a no-op catcher so tests don't see unhandled rejections if callers drop the promise.
+    refreshPromise.catch(() => {});
   }
 
   return refreshPromise;
