@@ -5,7 +5,7 @@ import apiFetch from "./apiFetch";
 
 export const bootstrapAuth = () => async (dispatch) => {
   try {
-    const res = await apiFetch(`${API}/auth/me`);
+    const res = await apiFetch(`${API}/auth/me`, { suppressRedirect: true });
     if (res.ok) {
       const user = await res.json();
       dispatch(signInSuccess(user));

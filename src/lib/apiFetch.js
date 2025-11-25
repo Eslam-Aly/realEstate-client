@@ -69,7 +69,9 @@ const performRefresh = async () => {
  * state and redirects to /signin.
  */
 const apiFetch = async (input, init = {}) => {
+  const { suppressRedirect } = init;
   const preparedInit = { credentials: "include", ...init };
+  delete preparedInit.suppressRedirect;
   const isRefreshCall =
     typeof input === "string" && input.includes("/auth/refresh");
   const response = await fetch(input, preparedInit);
@@ -85,7 +87,7 @@ const apiFetch = async (input, init = {}) => {
       __isRetry: true,
     });
   } catch (err) {
-    hardLogout();
+    if (!suppressRedirect) hardLogout();
     return response;
   }
 };
