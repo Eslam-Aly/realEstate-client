@@ -473,7 +473,7 @@ function Listing() {
                       data-testid="listing-images"
                       src={image}
                       alt={listing.title}
-                      className="w-full h-[550px] object-cover rounded"
+                      className="w-full h-[500px] md:h-[850px] object-contain  rounded"
                       onError={(e) => {
                         if (
                           e.currentTarget.src !==

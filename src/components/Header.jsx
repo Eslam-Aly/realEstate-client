@@ -38,9 +38,9 @@ function Header() {
       dir="ltr"
       className="bg-blue-700 text-white  w-full  shadow-md h-16 md:h-20 flex items-center sticky top-0 z-50"
     >
-      <div className="container mx-auto flex items-center justify-between w-[90%] ">
-        <div>
-          <Link to="/" className="text-sm md:text-2xl font-bold cursor-pointer">
+      <div className="container mx-auto flex items-center justify-between w-[90%] gap-2">
+        <div className="flex-shrink-0">
+          <Link to="/" className="cursor-pointer">
             <img
               src="logoHeader.png"
               alt="logo"
@@ -48,13 +48,13 @@ function Header() {
             />
           </Link>
         </div>
-        <div className="flex items-center justify-center ">
+        <div className="flex items-center justify-center flex-1 px-1">
           <form
             data-testid="home-search-bar"
             dir={isRTL ? "rtl" : "ltr"}
             onSubmit={handleSubmit}
-            className="flex w-[60%] sm:w-[80%] items-center rounded-full border
-            border-gray-300 bg-white/90 px-4 py-1 shadow-md backdrop-blur"
+            className="flex w-full max-w-xs sm:max-w-md items-center rounded-full border
+            border-gray-300 bg-white/90 px-3 py-1 shadow-md backdrop-blur"
           >
             <input
               data-testid="home-search-input"
@@ -67,13 +67,13 @@ function Header() {
             <button
               data-testid="home-search-submit"
               type="submit"
-              className="ml-2 flex h-6 w-6 items-center justify-center rounded-full text-blue-700"
+              className="pl-2 flex h-6 w-6 items-center justify-center rounded-full text-blue-700"
             >
               <FaSearch className="text-blue-700" />
             </button>
           </form>
         </div>
-        <nav className="flex items-center gap-2 md:gap-6 text-sm md:text-base">
+        <nav className="flex items-center gap-2 md:gap-6 text-sm md:text-base shrink-0">
           <Link to="/" className="hidden md:inline-block">
             {t("nav.home")}
           </Link>
@@ -84,7 +84,7 @@ function Header() {
               <img
                 src={currentUser.avatar}
                 alt="avatar"
-                className="rounded-full w-9 h-9 inline-block"
+                className="rounded-full w-8 h-8 md:w-10 md:h-10 inline-block "
               />
             </Link>
           ) : (
