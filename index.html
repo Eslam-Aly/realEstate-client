@@ -4,10 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script>
-      const lang =
-        navigator.language && navigator.language.startsWith("ar") ? "ar" : "en";
-      document.documentElement.lang = lang;
-      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+      (function () {
+        try {
+          const userLang = navigator.language || navigator.userLanguage || "en";
+          const lang = userLang.startsWith("ar") ? "ar" : "en";
+          document.documentElement.setAttribute("lang", lang);
+          document.documentElement.setAttribute(
+            "dir",
+            lang === "ar" ? "rtl" : "ltr"
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("lang", "en");
+          document.documentElement.setAttribute("dir", "ltr");
+        }
+      })();
     </script>
     <!-- Primary SEO -->
     <title>AqarDot – Buy & Rent Properties in Egypt | عقار دوت</title>
